@@ -8,6 +8,8 @@ export default defineConfig({
     include: ['**/*.e2e-spec.ts'],
     globals: true,
     root: './',
+    setupFiles: ['./test/setup-e2e.ts'],
+    pool: 'forks',
   },
   plugins: [
     tsConfigPaths(),
@@ -18,6 +20,8 @@ export default defineConfig({
   resolve: {
     alias: {
       src: resolve(__dirname, './src'),
+      '@': resolve(__dirname, './src'),
+      '@test': resolve(__dirname, './test'),
     },
   },
 });

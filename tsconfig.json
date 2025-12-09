@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
+    "module": "commonjs",
+    "moduleResolution": "node10",
     "types": ["vitest/globals"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
     },
     "esModuleInterop": true,
     "isolatedModules": true,

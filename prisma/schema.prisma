@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -13,5 +13,24 @@ datasource db {
 }
 
 model User {
-  id String @unique @default(uuid())
+  id           String         @id
+  name String
+  email        String         @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
 }
