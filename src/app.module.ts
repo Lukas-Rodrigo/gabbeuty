@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { envSchema } from './env.js';
+import { envSchema } from './env';
+import { AuthModule } from './modules/auth/infra/auth.module';
 
 @Module({
   imports: [
@@ -8,6 +9,7 @@ import { envSchema } from './env.js';
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],
