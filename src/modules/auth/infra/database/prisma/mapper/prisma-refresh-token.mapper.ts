@@ -7,7 +7,7 @@ export class PrismaRefreshTokenMapper {
     return RefreshToken.create(
       {
         userId: raw.userId,
-        createdAt: new Date(raw.createdAt),
+        createdAt: raw.createdAt ? new Date(raw.createdAt) : new Date(),
         expiresAt: new Date(raw.expiresAt),
         token: raw.token,
       },
