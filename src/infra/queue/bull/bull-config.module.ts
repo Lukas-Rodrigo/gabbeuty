@@ -4,6 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { QueueProvider } from '@/_shared/queue/queue-manager';
+import { BullQueueProvider } from './bull-queue.provider';
 
 @Global()
 @Module({
@@ -44,6 +46,12 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
       adapter: BullAdapter,
     }),
   ],
-  exports: [BullModule],
+  providers: [
+    {
+      provide: QueueProvider,
+      useClass: BullQueueProvider,
+    },
+  ],
+  exports: [BullModule, QueueProvider],
 })
 export class BullConfigModule {}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import bull from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { Queue, Job } from 'bull';
 import {
   QueueJob,
   QueueJobOptions,
@@ -8,15 +8,15 @@ import {
 } from '@/_shared/queue/queue-manager';
 
 @Injectable()
-export class BullQueueManager extends QueueProvider {
-  private queues: Map<string, bull.Queue>;
+export class BullQueueProvider extends QueueProvider {
+  private queues: Map<string, Queue>;
 
   constructor(
     @InjectQueue('calendar-sync')
-    private readonly calendarSyncQueue: bull.Queue,
+    private readonly calendarSyncQueue: Queue,
 
     @InjectQueue('notification')
-    private readonly notificationQueue: bull.Queue,
+    private readonly notificationQueue: Queue,
   ) {
     super();
 
@@ -71,7 +71,7 @@ export class BullQueueManager extends QueueProvider {
     return this.mapBullJobToQueueJob<T>(job);
   }
 
-  private mapBullJobToQueueJob<T>(bullJob: bull.Job): QueueJob<T> {
+  private mapBullJobToQueueJob<T>(bullJob: Job): QueueJob<T> {
     return {
       id: bullJob.id.toString(),
       name: bullJob.name,
