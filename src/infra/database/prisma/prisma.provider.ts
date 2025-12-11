@@ -27,10 +27,10 @@ export class PrismaService
 
     super({
       adapter,
-      log:
-        nodeEnv === 'development'
-          ? ['query', 'info', 'warn', 'error']
-          : ['warn', 'error'],
+      // log:
+      //   nodeEnv === 'development'
+      //     ? ['query', 'info', 'warn', 'error']
+      //     : ['warn', 'error'],
     });
   }
 

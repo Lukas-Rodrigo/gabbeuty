@@ -19,6 +19,8 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   refreshTokens RefreshToken[]
+  whatsAppSessions WhatsappSession[]
+
 
   @@map("users")
 }
@@ -33,4 +35,37 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model WhatsappSession {
+  id     String @id @default(uuid())
+  userId String 
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  phoneNumber String?
+  status      SessionStatus @default(DISCONNECTED)
+
+
+  retryCount Int @default(0)
+  maxRetries Int @default(3)
+
+  lastActivity   DateTime  @default(now())
+  connectedAt    DateTime?
+  disconnectedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId])
+  @@index([userId])
+  @@index([status])
+  @@map("whatsapp_sessions")
+}
+
+enum SessionStatus {
+  DISCONNECTED
+  CONNECTING
+  CONNECTED
+  QR_GENERATED
+  ERROR
 }
