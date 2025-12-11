@@ -1,5 +1,5 @@
 import { AppModule } from '@/app.module';
-import { PrismaService } from '@/modules/auth/infra/database/prisma.provider';
+import { PrismaService } from '@/infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/e2e/helpers/mock-entities.helper';
