@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
+import { UserRepository } from '../../../../_shared/repositories/user.repository';
 import { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
 import { TokenProvider } from '../../domain/providers/token.provider';
 import { Either, left, right } from '@/_shared/either';

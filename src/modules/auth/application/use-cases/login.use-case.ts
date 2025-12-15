@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
+import { UserRepository } from '../../../../_shared/repositories/user.repository';
 import { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
 import { HashProvider } from '../../domain/providers/hash.provider';
 import { TokenProvider } from '../../domain/providers/token.provider';

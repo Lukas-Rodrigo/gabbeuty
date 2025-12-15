@@ -1,5 +1,5 @@
 import { Env } from '@/env';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -14,6 +14,8 @@ export type TokenSchema = z.infer<typeof tokenSchema>;
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(config: ConfigService<Env, true>) {
     const publicKey = config.get('JWT_PUBLIC_KEY', { infer: true });
 
@@ -25,6 +27,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: TokenSchema) {
-    return tokenSchema.parse(payload);
+    try {
+      // Validate token payload structure
+      const validatedPayload = tokenSchema.parse(payload);
+
+      this.logger.log(
+        `Token validated successfully for user: ${validatedPayload.sub}`,
+      );
+
+      return validatedPayload;
+    } catch {
+      // If token payload is malformed or invalid, throw UnauthorizedException
+      this.logger.warn('Invalid token payload structure');
+
+      throw new UnauthorizedException('Invalid token payload');
+    }
   }
 }
