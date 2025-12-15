@@ -2,7 +2,6 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { AppointmentUseCasesModule } from './use-cases/appointments-use-cases.module';
 import { AppointmentsController } from './http/controllers/appointments.controller';
 import { WhatsappModule } from '@/modules/whatsapp/whatsapp.module';
-import { AppointmentNotificationService } from '../application/services/appointment-notification.service';
 import { CrmDatabaseModule } from './database/@database.module';
 import { BusinessServiceUseCaseModule } from './use-cases/business-service-use-cases.module';
 import { BusinessServicesController } from './http/controllers/business-services.controller';
@@ -28,12 +27,11 @@ import { AppointmentPatchHandler } from '../application/handlers/appointment-pat
     ClientsController,
   ],
   providers: [
-    AppointmentNotificationService,
     OnMessageWhatsappHandler,
     AppointmentCreatedHandler,
     AppointmentPatchHandler,
   ],
-  exports: [AppointmentNotificationService],
+  exports: [],
 })
 export class GabbeutyCrmModule implements OnModuleInit {
   constructor(
