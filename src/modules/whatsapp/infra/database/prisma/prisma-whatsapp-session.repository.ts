@@ -1,4 +1,4 @@
-import { PrismaService } from '@/infra/database/prisma/prisma.provider';
+import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { PhoneNumber } from '@/modules/whatsapp/domain/entities/value-object/phone-number';
 import { QRCode } from '@/modules/whatsapp/domain/entities/value-object/qr-code';
 import {
@@ -10,7 +10,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PrismaWhatsappSession implements WhatsAppSessionRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaProvider) {}
 
   async create(raw: WhatsAppSessionEntity): Promise<void> {
     await this.prisma.whatsappSession.upsert({
