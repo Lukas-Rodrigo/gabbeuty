@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HashProvider } from '../../domain/providers/hash.provider';
-import { UserRepository } from '../../domain/repositories/user.repository';
+import { UserRepository } from '../../../../_shared/repositories/user.repository';
 import { Either, left, right } from '@/_shared/either';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { NotBelongsError } from '@/_shared/errors/not-belongs.error';

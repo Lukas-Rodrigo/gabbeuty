@@ -2,9 +2,14 @@ import { Module } from '@nestjs/common';
 import { WhatsappUseCasesModule } from './infra/use-cases/whatsapp-use-cases.module';
 import { WhatsappSessionController } from './infra/http/controllers/whatsapp-session.controller';
 import { WhatsappEventsModule } from './infra/events/whatsapp.events.module';
+import { NotificationWhatsappQueueModule } from './infra/queue/notification-queue.module';
 
 @Module({
-  imports: [WhatsappUseCasesModule, WhatsappEventsModule],
+  imports: [
+    WhatsappUseCasesModule,
+    WhatsappEventsModule,
+    NotificationWhatsappQueueModule,
+  ],
   controllers: [WhatsappSessionController],
   providers: [],
   exports: [],

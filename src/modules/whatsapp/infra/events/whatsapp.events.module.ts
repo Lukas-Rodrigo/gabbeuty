@@ -7,4 +7,15 @@ import { WhatsappBootstrapSessionHandler } from './integration-handler/whatsapp-
   imports: [WhatsappUseCasesModule],
   providers: [WhatsAppSessionHandle, WhatsappBootstrapSessionHandler],
 })
-export class WhatsappEventsModule {}
+export class WhatsappEventsModule {
+  // constructor(
+  //   private notificationWhatsAppHandler: NotificationWhatsAppHandler,
+  // ) {}
+  // onModuleInit() {
+  //   DomainEvents.register(
+  //     'AppointmentCreatedEvent',
+  //     this.notificationWhatsAppHandler,
+  //   );
+  //   console.log('✅ Domain event handlers registered');
+  // }
+}

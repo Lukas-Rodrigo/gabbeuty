@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { WhatsAppSessionRepository } from '../../domain/repositories/whatsapp-session.repository';
 import { PrismaWhatsappSession } from './prisma/prisma-whatsapp-session.repository';
-import { PrismaService } from '@/infra/database/prisma/prisma.provider';
+import { SharedDatabaseModule } from '@/infra/database/@database.module';
 
 @Module({
-  imports: [],
+  imports: [SharedDatabaseModule],
   providers: [
-    PrismaService,
     {
       provide: WhatsAppSessionRepository,
       useClass: PrismaWhatsappSession,

@@ -12,11 +12,11 @@ import { Pool } from 'pg';
 import { Env } from '@/env';
 
 @Injectable()
-export class PrismaService
+export class PrismaProvider
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  private readonly logger = new Logger(PrismaService.name);
+  private readonly logger = new Logger(PrismaProvider.name);
 
   constructor(@Inject(ConfigService) configService: ConfigService<Env, true>) {
     const databaseUrl = configService.get('DATABASE_URL', { infer: true });

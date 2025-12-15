@@ -1,255 +1,272 @@
-// // domain/whatsapp/enterprise/value-objects/templates/appointment-template.vo.ts
+import { AppointmentStatus } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-status.vo';
+import { AppointmentStatusMapper } from '../mappers/appointment-status.mapper';
+
+export interface AppointmentData {
+  title: string;
+  date: Date;
+  status: AppointmentStatus;
+  clientName?: string;
+  professionalName?: string;
+  location?: string;
+}
+
+export class AppointmentTemplate {
+  static getByStatus(data: AppointmentData): string {
+    switch (data.status) {
+      case AppointmentStatus.PENDING:
+        return this.pending(data);
+
+      case AppointmentStatus.CONFIRMED:
+        return this.confirmation(data);
 
-// import { AppointmentStatus } from "@/domain/gabbeuty-crm/enterprise/entities/value-object/appointment-status.vo";
-// import { AppointmentStatusMapper } from "@/core/mappers/appointment-status.mapper";
+      case AppointmentStatus.COMPLETED:
+        return this.completed(data);
 
-// export interface AppointmentData {
-//   title: string;
-//   date: Date;
-//   status: AppointmentStatus;
-//   clientName?: string;
-//   professionalName?: string;
-//   location?: string;
-// }
+      case AppointmentStatus.CANCELED:
+        return this.cancellation(data);
 
-// export class AppointmentTemplate {
-//   /**
-//    * Template para confirmação de agendamento
-//    */
-//   static confirmation(data: AppointmentData): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
-//     const statusText = AppointmentStatusMapper.toPortuguese(data.status);
+      default:
+        return this.pending(data);
+    }
+  }
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  ✅ *AGENDAMENTO CONFIRMADO*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+  /**
+   * Template para confirmação de agendamento
+   */
+  static confirmation(data: AppointmentData): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+    const statusText = AppointmentStatusMapper.toPortuguese(data.status);
 
-// ℹ️ *Informações:*
-// ${data.title}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  ✅ *AGENDAMENTO CONFIRMADO*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// 📊 *Status:*
-// ${statusText}
+🕐 *Horário:*
+${timeFormatted}
 
-// ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+📊 *Status:*
+${statusText}
 
-// 🔔 _Você receberá um lembrete próximo ao horário_`;
-//   }
+┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   /**
-//    * Template para mudança de status
-//    */
-//   static statusChange(
-//     data: AppointmentData,
-//     previousStatus: AppointmentStatus
-//   ): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
-//     const oldStatusText = AppointmentStatusMapper.toPortuguese(previousStatus);
-//     const newStatusText = AppointmentStatusMapper.toPortuguese(data.status);
+🔔 _Você receberá um lembrete próximo ao horário_`;
+  }
 
-//     const icon = this.getStatusIcon(data.status);
-//     const header = this.getStatusHeader(data.status);
+  /**
+   * Template para mudança de status
+   */
+  static statusChange(
+    data: AppointmentData,
+    previousStatus: AppointmentStatus,
+  ): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+    const oldStatusText = AppointmentStatusMapper.toPortuguese(previousStatus);
+    const newStatusText = AppointmentStatusMapper.toPortuguese(data.status);
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  ${icon} *${header}*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+    const icon = this.getStatusIcon(data.status);
+    const header = this.getStatusHeader(data.status);
 
-// ℹ️ *Informações:*
-// ${data.title}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  ${icon} *${header}*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// 📊 *Status Anterior:*
-// ${oldStatusText}
+🕐 *Horário:*
+${timeFormatted}
 
-// 📊 *Novo Status:*
-// ${newStatusText}
+📊 *Status Anterior:*
+${oldStatusText}
 
-// ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+📊 *Novo Status:*
+${newStatusText}
 
-// ${this.getStatusFooter(data.status)}`;
-//   }
+┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   /**
-//    * Template para lembrete de agendamento
-//    */
-//   static reminder(data: AppointmentData, minutesUntil: number): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
-//     const timeText = this.formatTimeUntil(minutesUntil);
+${this.getStatusFooter(data.status)}`;
+  }
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  🔔 *LEMBRETE DE AGENDAMENTO*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+  /**
+   * Template para lembrete de agendamento
+   */
+  static reminder(data: AppointmentData, minutesUntil: number): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+    const timeText = this.formatTimeUntil(minutesUntil);
 
-// ⏰ *Seu agendamento está próximo!*
-// ${timeText}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  🔔 *LEMBRETE DE AGENDAMENTO*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// ℹ️ *Informações:*
-// ${data.title}
+⏰ *Seu agendamento está próximo!*
+${timeText}
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// ${data.location ? `📍 *Local:*\n${data.location}\n\n` : ""}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+🕐 *Horário:*
+${timeFormatted}
 
-// 💡 _Esteja pronto alguns minutos antes_`;
-//   }
+${data.location ? `📍 *Local:*\n${data.location}\n\n` : ''}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   /**
-//    * Template para cancelamento
-//    */
-//   static cancellation(data: AppointmentData, reason?: string): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+💡 _Esteja pronto alguns minutos antes_`;
+  }
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  ❌ *AGENDAMENTO CANCELADO*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+  /**
+   * Template para cancelamento
+   */
+  static cancellation(data: AppointmentData, reason?: string): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
 
-// ℹ️ *Informações:*
-// ${data.title}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  ❌ *AGENDAMENTO CANCELADO*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// ${reason ? `📝 *Motivo:*\n${reason}\n\n` : ""}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+🕐 *Horário:*
+${timeFormatted}
 
-// 📞 _Entre em contato para reagendar_`;
-//   }
+${reason ? `📝 *Motivo:*\n${reason}\n\n` : ''}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   /**
-//    * Template para agendamento pendente
-//    */
-//   static pending(data: AppointmentData): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+📞 _Entre em contato para reagendar_`;
+  }
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  ⏳ *AGENDAMENTO PENDENTE*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+  /**
+   * Template para agendamento pendente
+   */
+  static pending(data: AppointmentData): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
 
-// ℹ️ *Informações:*
-// ${data.title}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  ⏳ *AGENDAMENTO PENDENTE*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+🕐 *Horário:*
+${timeFormatted}
 
-// ⚠️ _Aguardando confirmação_
-// 📱 _Você será notificado quando for confirmado_`;
-//   }
+┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   /**
-//    * Template para agendamento completo
-//    */
-//   static completed(data: AppointmentData): string {
-//     const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
+⚠️ _Aguardando confirmação_
+📱 _Você será notificado quando for confirmado_`;
+  }
 
-//     return `┏━━━━━━━━━━━━━━━━━━━━┓
-// ┃  ✨ *AGENDAMENTO CONCLUÍDO*  ┃
-// ┗━━━━━━━━━━━━━━━━━━━━┛
+  /**
+   * Template para agendamento completo
+   */
+  static completed(data: AppointmentData): string {
+    const { dateFormatted, timeFormatted } = this.formatDateTime(data.date);
 
-// ℹ️ *Informações:*
-// ${data.title}
+    return `┏━━━━━━━━━━━━━━━━━━━━┓
+┃  ✨ *AGENDAMENTO CONCLUÍDO*  ┃
+┗━━━━━━━━━━━━━━━━━━━━┛
 
-// 📅 *Data:*
-// ${dateFormatted}
+ℹ️ *Informações:*
+${data.title}
 
-// 🕐 *Horário:*
-// ${timeFormatted}
+📅 *Data:*
+${dateFormatted}
 
-// ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+🕐 *Horário:*
+${timeFormatted}
 
-// 🙏 _Obrigado por comparecer!_
-// ⭐ _Sua avaliação é muito importante para nós_`;
-//   }
+┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-//   // ===== Métodos auxiliares privados =====
+🙏 _Obrigado por comparecer!_
+⭐ _Sua avaliação é muito importante para nós_`;
+  }
 
-//   private static formatDateTime(date: Date): {
-//     dateFormatted: string;
-//     timeFormatted: string;
-//   } {
-//     const appointmentDate = new Date(date);
+  // ===== Métodos auxiliares privados =====
 
-//     const dateFormatted = appointmentDate.toLocaleDateString("pt-BR", {
-//       weekday: "long",
-//       day: "2-digit",
-//       month: "long",
-//       year: "numeric",
-//     });
+  private static formatDateTime(date: Date): {
+    dateFormatted: string;
+    timeFormatted: string;
+  } {
+    const appointmentDate = new Date(date);
 
-//     const timeFormatted = appointmentDate.toLocaleTimeString("pt-BR", {
-//       hour: "2-digit",
-//       minute: "2-digit",
-//     });
+    const dateFormatted = appointmentDate.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
 
-//     return { dateFormatted, timeFormatted };
-//   }
+    const timeFormatted = appointmentDate.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
-//   private static formatTimeUntil(minutes: number): string {
-//     if (minutes < 60) {
-//       return `Faltam ${minutes} minutos`;
-//     }
+    return { dateFormatted, timeFormatted };
+  }
 
-//     const hours = Math.floor(minutes / 60);
-//     const remainingMinutes = minutes % 60;
+  private static formatTimeUntil(minutes: number): string {
+    if (minutes < 60) {
+      return `Faltam ${minutes} minutos`;
+    }
 
-//     if (remainingMinutes === 0) {
-//       return `Falta${hours > 1 ? "m" : ""} ${hours} hora${hours > 1 ? "s" : ""}`;
-//     }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
 
-//     return `Faltam ${hours}h${remainingMinutes}min`;
-//   }
+    if (remainingMinutes === 0) {
+      return `Falta${hours > 1 ? 'm' : ''} ${hours} hora${hours > 1 ? 's' : ''}`;
+    }
 
-//   private static getStatusIcon(status: AppointmentStatus): string {
-//     const icons = {
-//       [AppointmentStatus.PENDING]: "⏳",
-//       [AppointmentStatus.CONFIRMED]: "✅",
-//       [AppointmentStatus.COMPLETED]: "✨",
-//       [AppointmentStatus.CANCELED]: "❌",
-//     };
+    return `Faltam ${hours}h${remainingMinutes}min`;
+  }
 
-//     return icons[status] || "📋";
-//   }
+  private static getStatusIcon(status: AppointmentStatus): string {
+    const icons = {
+      [AppointmentStatus.PENDING]: '⏳',
+      [AppointmentStatus.CONFIRMED]: '✅',
+      [AppointmentStatus.COMPLETED]: '✨',
+      [AppointmentStatus.CANCELED]: '❌',
+    };
 
-//   private static getStatusHeader(status: AppointmentStatus): string {
-//     const headers = {
-//       [AppointmentStatus.PENDING]: "STATUS ALTERADO",
-//       [AppointmentStatus.CONFIRMED]: "AGENDAMENTO CONFIRMADO",
-//       [AppointmentStatus.COMPLETED]: "AGENDAMENTO CONCLUÍDO",
-//       [AppointmentStatus.CANCELED]: "AGENDAMENTO CANCELADO",
-//     };
+    return icons[status] || '📋';
+  }
 
-//     return headers[status] || "STATUS ATUALIZADO";
-//   }
+  private static getStatusHeader(status: AppointmentStatus): string {
+    const headers = {
+      [AppointmentStatus.PENDING]: 'STATUS ALTERADO',
+      [AppointmentStatus.CONFIRMED]: 'AGENDAMENTO CONFIRMADO',
+      [AppointmentStatus.COMPLETED]: 'AGENDAMENTO CONCLUÍDO',
+      [AppointmentStatus.CANCELED]: 'AGENDAMENTO CANCELADO',
+    };
 
-//   private static getStatusFooter(status: AppointmentStatus): string {
-//     const footers = {
-//       [AppointmentStatus.PENDING]: "⚠️ _Aguardando confirmação_",
-//       [AppointmentStatus.CONFIRMED]:
-//         "🔔 _Você receberá um lembrete próximo ao horário_",
-//       [AppointmentStatus.COMPLETED]: "🙏 _Obrigado por comparecer!_",
-//       [AppointmentStatus.CANCELED]: "📞 _Entre em contato para reagendar_",
-//     };
+    return headers[status] || 'STATUS ATUALIZADO';
+  }
 
-//     return footers[status] || "";
-//   }
-// }
+  private static getStatusFooter(status: AppointmentStatus): string {
+    const footers = {
+      [AppointmentStatus.PENDING]: '⚠️ _Aguardando confirmação_',
+      [AppointmentStatus.CONFIRMED]:
+        '🔔 _Você receberá um lembrete próximo ao horário_',
+      [AppointmentStatus.COMPLETED]: '🙏 _Obrigado por comparecer!_',
+      [AppointmentStatus.CANCELED]: '📞 _Entre em contato para reagendar_',
+    };
+
+    return footers[status] || '';
+  }
+}
