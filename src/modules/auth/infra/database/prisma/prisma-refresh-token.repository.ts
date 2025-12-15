@@ -1,4 +1,4 @@
-import { PrismaService } from '@/infra/database/prisma/prisma.provider';
+import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { RefreshToken } from '@/modules/auth/domain/entities/refresh-token';
 import { RefreshTokenRepository } from '@/modules/auth/domain/repositories/refresh-token.repository';
 import { Injectable } from '@nestjs/common';
@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaProvider) {}
 
   async create(
     userId: string,
