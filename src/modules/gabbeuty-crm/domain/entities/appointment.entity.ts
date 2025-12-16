@@ -14,6 +14,14 @@ import {
   AppointmentPatchPayload,
 } from '../events/appointment-patch.event';
 import { AppointmentService } from './value-objects/appointment-service';
+import {
+  AppointmentConfirmedEvent,
+  AppointmentConfirmedEventPayload,
+} from '../events/appointment-confirmed.event';
+import {
+  AppointmentCanceledEvent,
+  AppointmentCanceledEventPayload,
+} from '../events/appointment-canceled.event';
 
 export class AppointmentMustHaveAtLeastOneServiceError extends Error {
   constructor() {
@@ -112,6 +120,14 @@ export class Appointment extends AggregateRoot<AppointmentProps> {
 
   markAsPatch(payload: AppointmentPatchPayload) {
     this.addDomainEvent(new AppointmentPatchEvent(payload));
+  }
+
+  markAsConfirmed(payload: AppointmentConfirmedEventPayload) {
+    this.addDomainEvent(new AppointmentConfirmedEvent(payload));
+  }
+
+  markAsCanceled(payload: AppointmentCanceledEventPayload) {
+    this.addDomainEvent(new AppointmentCanceledEvent(payload));
   }
 
   get createdAt() {
