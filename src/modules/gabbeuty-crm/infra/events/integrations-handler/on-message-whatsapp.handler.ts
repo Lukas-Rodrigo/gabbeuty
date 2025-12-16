@@ -39,6 +39,13 @@ export class OnMessageWhatsappHandler {
           status: AppointmentStatus.CONFIRMED,
         });
         break;
+      case 'cancelar':
+        await this.patchAppointmentUseCase.execute({
+          appointmentId: event.appointmentId,
+          professionalId: event.userId,
+          status: AppointmentStatus.CANCELED,
+        });
+        break;
     }
   }
 }
