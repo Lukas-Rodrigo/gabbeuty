@@ -111,14 +111,13 @@ export class PatchAppointmentUseCase {
         servicesIds,
         professionalId,
       );
-      console.log('Patch services: ', updateServicesResult.value);
 
       if (updateServicesResult.isLeft()) {
         return left(updateServicesResult.value);
       }
     }
 
-    appointment.markAsPatch({
+    const appointmentEventData = {
       appointmentId: appointment.id.toValue(),
       clientId: appointment.id.toValue(),
       userId: appointment.professionalId.toValue(),
@@ -127,7 +126,19 @@ export class PatchAppointmentUseCase {
       status: appointment.status,
       title: appointment.title,
       clientName: appointment.clientName,
-    });
+    };
+
+    if (appointment.status === 'CONFIRMED') {
+      appointment.markAsConfirmed(appointmentEventData);
+    }
+
+    if (appointment.status === 'CANCELED') {
+      console.log('--------- canceled appointment -------------');
+
+      appointment.markAsCanceled(appointmentEventData);
+    }
+
+    appointment.markAsPatch(appointmentEventData);
     await this.appointmentsRepository.save(appointmentId, appointment);
 
     return right({
