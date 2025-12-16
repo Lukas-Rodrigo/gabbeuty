@@ -1,5 +1,5 @@
 import { AppModule } from '@/app.module';
-import { PrismaService } from '@/modules/auth/infra/database/prisma.provider';
+import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/e2e/helpers/mock-entities.helper';
@@ -7,7 +7,7 @@ import request from 'supertest';
 
 describe('Logout User (E2E)', () => {
   let app: INestApplication;
-  let prisma: PrismaService;
+  let prisma: PrismaProvider;
   let mockEntities: MockEntities;
 
   beforeAll(async () => {
