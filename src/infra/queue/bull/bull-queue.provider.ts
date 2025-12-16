@@ -56,19 +56,26 @@ export class BullQueueProvider extends QueueProvider {
   }
 
   async removeJob(jobId: string): Promise<void> {
-    const job = await this.calendarSyncQueue.getJob(jobId);
-    if (!job) {
-      throw new Error(`Job ${jobId} not found`);
+    // Tenta buscar em todas as filas
+    for (const queue of this.queues.values()) {
+      const job = await queue.getJob(jobId);
+      if (job) {
+        await job.remove();
+        return;
+      }
     }
-    await job.remove();
+    throw new Error(`Job ${jobId} not found in any queue`);
   }
 
   async getJob<T>(jobId: string): Promise<QueueJob<T> | null> {
-    const job = await this.calendarSyncQueue.getJob(jobId);
-    if (!job) {
-      return null;
+    // Tenta buscar em todas as filas
+    for (const queue of this.queues.values()) {
+      const job = await queue.getJob(jobId);
+      if (job) {
+        return this.mapBullJobToQueueJob<T>(job);
+      }
     }
-    return this.mapBullJobToQueueJob<T>(job);
+    return null;
   }
 
   private mapBullJobToQueueJob<T>(bullJob: Job): QueueJob<T> {

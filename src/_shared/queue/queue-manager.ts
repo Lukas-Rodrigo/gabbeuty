@@ -1,4 +1,5 @@
 export interface QueueJobOptions {
+  jobId?: string;
   attempts?: number;
   backoff?: {
     type: 'fixed' | 'exponential';

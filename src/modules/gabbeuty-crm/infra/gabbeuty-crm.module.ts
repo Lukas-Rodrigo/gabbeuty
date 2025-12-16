@@ -12,14 +12,16 @@ import { AppointmentCreatedHandler } from '../application/handlers/appointment-c
 import { OnMessageWhatsappHandler } from './events/integrations-handler/on-message-whatsapp.handler';
 import { DomainEvents } from '@/_shared/event/domain-events';
 import { AppointmentPatchHandler } from '../application/handlers/appointment-patch.handler';
+import { AppointmentConfirmedHandler } from '../application/handlers/appointment-confirmed.handler';
+import { AppointmentCanceledHandler } from '../application/handlers/appointment-canceled.handler';
 
 @Module({
   imports: [
-    CrmDatabaseModule, // Import database module to get repositories
+    CrmDatabaseModule,
     AppointmentUseCasesModule,
     BusinessServiceUseCaseModule,
     ClientsUseCaseModule,
-    WhatsappModule, // Import WhatsApp module to get NotificationService implementation
+    WhatsappModule,
   ],
   controllers: [
     AppointmentsController,
@@ -30,6 +32,8 @@ import { AppointmentPatchHandler } from '../application/handlers/appointment-pat
     OnMessageWhatsappHandler,
     AppointmentCreatedHandler,
     AppointmentPatchHandler,
+    AppointmentConfirmedHandler,
+    AppointmentCanceledHandler,
   ],
   exports: [],
 })
@@ -37,6 +41,8 @@ export class GabbeutyCrmModule implements OnModuleInit {
   constructor(
     private appointmentCreatedHandler: AppointmentCreatedHandler,
     private appointmentPatchHandler: AppointmentPatchHandler,
+    private appointmentConfirmedHandler: AppointmentConfirmedHandler,
+    private appointmentCanceledHandler: AppointmentCanceledHandler,
   ) {}
 
   onModuleInit() {
@@ -48,6 +54,16 @@ export class GabbeutyCrmModule implements OnModuleInit {
     DomainEvents.register(
       'AppointmentPatchEvent',
       this.appointmentPatchHandler,
+    );
+
+    DomainEvents.register(
+      'AppointmentConfirmedEvent',
+      this.appointmentConfirmedHandler,
+    );
+
+    DomainEvents.register(
+      'AppointmentCanceledEvent',
+      this.appointmentCanceledHandler,
     );
 
     console.log('✅ Domain event handlers registered');
