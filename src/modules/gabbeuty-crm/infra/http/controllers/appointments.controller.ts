@@ -26,6 +26,7 @@ import { FetchInvoicingUseCase } from '@/modules/gabbeuty-crm/application/use-ca
 import { PatchAppointmentUseCase } from '@/modules/gabbeuty-crm/application/use-cases/appointments/patch-appointment.use-case';
 import { UUIDParamDto } from '../dto/uuid-param.dto';
 import { PatchAppointmentDto } from '../dto/patch-appointments.dto';
+import { AppointmentsApiDoc } from '@/_shared/docs/swagger.decorators';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -40,6 +41,7 @@ export class AppointmentsController {
     private fetchInvoicingUseCase: FetchInvoicingUseCase,
   ) {}
 
+  @AppointmentsApiDoc.Create()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@CurrentUser() user, @Body() body: CreateAppointmentDto) {
@@ -66,6 +68,7 @@ export class AppointmentsController {
     return result.value;
   }
 
+  @AppointmentsApiDoc.Update()
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async patch(
@@ -98,6 +101,7 @@ export class AppointmentsController {
     return result.value;
   }
 
+  @AppointmentsApiDoc.Fetch()
   @Get()
   @HttpCode(HttpStatus.OK)
   async fetch(@CurrentUser() user, @Query() queries: FiltersFetchQueriesDto) {
@@ -121,6 +125,7 @@ export class AppointmentsController {
     return result.value;
   }
 
+  @AppointmentsApiDoc.CountByStatus()
   @Get('status')
   @HttpCode(HttpStatus.OK)
   async countAppointmentByStatus(
@@ -149,6 +154,7 @@ export class AppointmentsController {
     return result.value;
   }
 
+  @AppointmentsApiDoc.FetchMetrics()
   @Get('metrics')
   @HttpCode(HttpStatus.OK)
   async fetchAppointmentsMetrics(
@@ -174,6 +180,7 @@ export class AppointmentsController {
     return result.value;
   }
 
+  @AppointmentsApiDoc.FetchInvoicing()
   @Get('invoicing')
   @HttpCode(HttpStatus.OK)
   async fetchInvoicing(@CurrentUser() user, @Query() queries: DateRangeDto) {

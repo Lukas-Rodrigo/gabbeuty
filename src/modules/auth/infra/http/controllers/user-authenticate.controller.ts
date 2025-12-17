@@ -16,6 +16,7 @@ import { RegisterUserDto } from '../dto/register-user.dto';
 import { Public } from '../../jwt/public.decorator';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { mapDomainErrorToHttpException } from '@/_shared/filters/map-domain-error';
+import { AuthApiDoc } from '@/_shared/docs/swagger.decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,7 @@ export class AuthController {
     private registerUseCase: CreateUserUseCase,
   ) {}
 
+  @AuthApiDoc.Register()
   @Public()
   @Post('register')
   async register(@Body() body: RegisterUserDto) {
@@ -48,6 +50,7 @@ export class AuthController {
     return result.value;
   }
 
+  @AuthApiDoc.Login()
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -65,6 +68,7 @@ export class AuthController {
     return result.value;
   }
 
+  @AuthApiDoc.Refresh()
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
@@ -84,6 +88,7 @@ export class AuthController {
     return result.value;
   }
 
+  @AuthApiDoc.Logout()
   @Public()
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
