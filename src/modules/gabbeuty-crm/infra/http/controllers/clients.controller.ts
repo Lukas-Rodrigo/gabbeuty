@@ -20,6 +20,7 @@ import { UUIDParamDto } from '../dto/uuid-param.dto';
 import { CreateClientDto } from '../dto/create-client.dto';
 import { FetchClientsQueriesDto } from '../dto/fetch-clients-queries.dto';
 import { PatchClientDto } from '../dto/patch-clients.dto';
+import { ClientsApiDoc } from '@/_shared/docs/swagger.decorators';
 
 @Controller('clients')
 export class ClientsController {
@@ -30,6 +31,7 @@ export class ClientsController {
     private deleteClientsUseCase: DeleteClientsUseCase,
   ) {}
 
+  @ClientsApiDoc.Create()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@CurrentUser() userPayload, @Body() body: CreateClientDto) {
@@ -48,6 +50,7 @@ export class ClientsController {
     }
   }
 
+  @ClientsApiDoc.Update()
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async patch(
@@ -75,6 +78,7 @@ export class ClientsController {
     return result.value;
   }
 
+  @ClientsApiDoc.Fetch()
   @Get()
   async fetch(@CurrentUser() user, @Query() queries: FetchClientsQueriesDto) {
     const { sub: professionalId } = user;
@@ -99,6 +103,7 @@ export class ClientsController {
     return result.value;
   }
 
+  @ClientsApiDoc.Delete()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async handle(@CurrentUser() user, @Param() { id: clientId }: UUIDParamDto) {

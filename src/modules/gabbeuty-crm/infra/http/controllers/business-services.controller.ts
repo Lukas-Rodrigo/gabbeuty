@@ -20,7 +20,10 @@ import { mapDomainErrorToHttpException } from '@/_shared/filters/map-domain-erro
 import { UUIDParamDto } from '../dto/uuid-param.dto';
 import { PatchBusinessServicesBodyDto } from '../dto/patch-business-services-body-.dto';
 import { FiltersFetchQueriesDto } from '../dto/filters-fetch-queries.dto';
+import { BusinessServicesApiDoc } from '@/_shared/docs/swagger.decorators';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Business Services')
 @Controller('business-services')
 export class BusinessServicesController {
   constructor(
@@ -30,6 +33,7 @@ export class BusinessServicesController {
     private deleteBusinessServiceUseCase: DeleteBusinessServicesUseCase,
   ) {}
 
+  @BusinessServicesApiDoc.Create()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@CurrentUser() user, @Body() body: CreateBusinessServicesDto) {
@@ -49,6 +53,7 @@ export class BusinessServicesController {
     return result.value;
   }
 
+  @BusinessServicesApiDoc.Update()
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async patch(
@@ -75,6 +80,7 @@ export class BusinessServicesController {
     return result.value;
   }
 
+  @BusinessServicesApiDoc.Fetch()
   @Get()
   @HttpCode(HttpStatus.OK)
   async fetch(@CurrentUser() user, @Query() queries: FiltersFetchQueriesDto) {
@@ -101,6 +107,7 @@ export class BusinessServicesController {
     return result.value;
   }
 
+  @BusinessServicesApiDoc.Delete()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@CurrentUser() user, @Param() { id }: UUIDParamDto) {
