@@ -2,13 +2,15 @@ import { AppModule } from '@/app.module';
 import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { MockEntities } from '@test/e2e/helpers/mock-entities.helper';
+import { MockEntities } from '@test/e2e/_helpers/mock-entities.helper';
 import request from 'supertest';
 
-describe('Refresh Token (E2E)', () => {
+describe('Create WhatsApp Session (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
+  let accessToken: string;
+  let userId: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,16 +33,9 @@ describe('Refresh Token (E2E)', () => {
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
     await app.init();
-  });
 
-  afterAll(async () => {
-    await mockEntities.cleanupAll();
-    await app.close();
-    await prisma.$disconnect();
-  });
-
-  test('[POST] /auth/refresh', async () => {
     const user = await mockEntities.createUser();
+    userId = user.id;
 
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
@@ -49,51 +44,39 @@ describe('Refresh Token (E2E)', () => {
         password: user.plainPassword,
       });
 
-    const { refreshToken } = loginResponse.body;
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/refresh')
-      .send({
-        refreshToken,
-      });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('accessToken');
-    expect(response.body).toHaveProperty('refreshToken');
-    expect(response.body.refreshToken).not.toBe(refreshToken);
+    accessToken = loginResponse.body.accessToken;
   });
 
-  test('[POST] /auth/refresh - should return 401 for invalid token', async () => {
+  afterAll(async () => {
+    await mockEntities.cleanupAll();
+    await app.close();
+    await prisma.$disconnect();
+  });
+
+  test('[POST] /whatsapp', async () => {
     const response = await request(app.getHttpServer())
-      .post('/auth/refresh')
-      .send({
-        refreshToken: 'invalid-token',
-      });
+      .post('/whatsapp')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('sessionId');
+    expect(response.body).toHaveProperty('userId');
+    expect(response.body.userId).toBe(userId);
+    expect(typeof response.body.sessionId).toBe('string');
+  });
+
+  test('[POST] /whatsapp - should return 401 without token', async () => {
+    const response = await request(app.getHttpServer()).post('/whatsapp');
 
     expect(response.statusCode).toBe(401);
   });
 
-  test('[POST] /auth/refresh - should return 401 for expired token', async () => {
-    const user = await mockEntities.createUser();
-
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() - 1);
-
-    const expiredToken = await mockEntities.createRefreshToken(
-      user.id,
-      'expired-token',
-    );
-
-    await prisma.refreshToken.update({
-      where: { id: expiredToken.id },
-      data: { expiresAt: expiredDate },
-    });
-
+  test('[POST] /whatsapp - should return 401 with invalid token', async () => {
     const response = await request(app.getHttpServer())
-      .post('/auth/refresh')
-      .send({
-        refreshToken: expiredToken.token,
-      });
+      .post('/whatsapp')
+      .set('Authorization', 'Bearer invalid-token')
+      .send();
 
     expect(response.statusCode).toBe(401);
   });

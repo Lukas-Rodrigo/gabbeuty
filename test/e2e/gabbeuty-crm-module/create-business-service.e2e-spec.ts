@@ -2,13 +2,14 @@ import { AppModule } from '@/app.module';
 import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { MockEntities } from '@test/e2e/helpers/mock-entities.helper';
+import { MockEntities } from '@test/e2e/_helpers/mock-entities.helper';
 import request from 'supertest';
 
-describe('Logout User (E2E)', () => {
+describe('Create Business Service (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
+  let accessToken: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -16,7 +17,6 @@ describe('Logout User (E2E)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -28,18 +28,10 @@ describe('Logout User (E2E)', () => {
       }),
     );
 
-    prisma = moduleRef.get(PrismaService);
+    prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
     await app.init();
-  });
 
-  afterAll(async () => {
-    await mockEntities.cleanupAll();
-    await app.close();
-    await prisma.$disconnect();
-  });
-
-  test('[POST] /auth/logout', async () => {
     const user = await mockEntities.createUser();
 
     const loginResponse = await request(app.getHttpServer())
@@ -49,30 +41,46 @@ describe('Logout User (E2E)', () => {
         password: user.plainPassword,
       });
 
-    const { refreshToken } = loginResponse.body;
-
-    const response = await request(app.getHttpServer())
-      .post('/auth/logout')
-      .send({
-        refreshToken,
-      });
-
-    expect(response.statusCode).toBe(204);
-
-    const tokenInDb = await prisma.refreshToken.findUnique({
-      where: { token: refreshToken },
-    });
-
-    expect(tokenInDb).toBeNull();
+    accessToken = loginResponse.body.accessToken;
   });
 
-  test('[POST] /auth/logout - should not fail for non-existent token', async () => {
+  afterAll(async () => {
+    await mockEntities.cleanupAll();
+    await app.close();
+    await prisma.$disconnect();
+  });
+
+  test('[POST] /business-services', async () => {
     const response = await request(app.getHttpServer())
-      .post('/auth/logout')
+      .post('/business-services')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        refreshToken: 'non-existent-token',
+        name: 'Haircut Service',
+        price: 50.0,
       });
 
-    expect(response.statusCode).toBe(204);
+    expect(response.statusCode).toBe(201);
+  });
+
+  test('[POST] /business-services - should return 401 without token', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/business-services')
+      .send({
+        name: 'Haircut Service',
+        price: 50.0,
+      });
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  test('[POST] /business-services - should return 400 for missing name', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/business-services')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        price: 50.0,
+      });
+
+    expect(response.statusCode).toBe(400);
   });
 });

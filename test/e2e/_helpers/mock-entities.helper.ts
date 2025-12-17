@@ -1,13 +1,13 @@
 import { INestApplication } from '@nestjs/common';
-import { PrismaService } from '@/modules/auth/infra/database/prisma.provider';
 import { hash } from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { faker } from '@faker-js/faker';
+import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 
 export class MockEntities {
   constructor(
     private app: INestApplication,
-    private prisma: PrismaService,
+    private prisma: PrismaProvider,
   ) {}
 
   async createUser(data?: {
@@ -50,6 +50,9 @@ export class MockEntities {
 
   async cleanupAll() {
     await this.prisma.refreshToken.deleteMany();
+    await this.prisma.appointment.deleteMany();
+    await this.prisma.businessService.deleteMany();
+    await this.prisma.client.deleteMany();
     await this.prisma.user.deleteMany();
   }
 }

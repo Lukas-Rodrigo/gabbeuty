@@ -2,10 +2,10 @@ import { AppModule } from '@/app.module';
 import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { MockEntities } from '@test/e2e/helpers/mock-entities.helper';
+import { MockEntities } from '@test/e2e/_helpers/mock-entities.helper';
 import request from 'supertest';
 
-describe('Register User (E2E)', () => {
+describe('Login User (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
@@ -39,56 +39,53 @@ describe('Register User (E2E)', () => {
     await prisma.$disconnect();
   });
 
-  test('[POST] /auth/register', async () => {
+  test('[POST] /auth/login', async () => {
+    const user = await mockEntities.createUser();
+
     const response = await request(app.getHttpServer())
-      .post('/auth/register')
+      .post('/auth/login')
       .send({
-        name: 'John Doe',
-        email: 'john@example.com',
+        email: user.email,
+        password: user.plainPassword,
+      });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('accessToken');
+    expect(response.body).toHaveProperty('refreshToken');
+    expect(typeof response.body.accessToken).toBe('string');
+    expect(typeof response.body.refreshToken).toBe('string');
+  });
+
+  test('[POST] /auth/login - should return 404 for wrong password', async () => {
+    const user = await mockEntities.createUser();
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: user.email,
+        password: 'wrong-password',
+      });
+
+    expect(response.statusCode).toBe(404);
+  });
+
+  test('[POST] /auth/login - should return 404 for non-existent user', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: 'nonexistent@example.com',
         password: '12345678',
       });
 
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body).toHaveProperty('email');
-    expect(response.body.email).toBe('john@example.com');
+    expect(response.statusCode).toBe(404);
   });
 
-  test('[POST] /auth/register - should return 400 for duplicate email', async () => {
-    const email = 'duplicate@example.com';
-
-    await mockEntities.createUser({ email });
-
+  test('[POST] /auth/login - should return 400 for invalid data', async () => {
     const response = await request(app.getHttpServer())
-      .post('/auth/register')
+      .post('/auth/login')
       .send({
-        name: 'Jane Doe',
-        email,
-        password: '12345678',
-      });
-
-    expect(response.statusCode).toBe(400);
-  });
-
-  test('[POST] /auth/register - should return 400 for invalid email', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        name: 'Test User',
         email: 'invalid-email',
-        password: '12345678',
-      });
-
-    expect(response.statusCode).toBe(400);
-  });
-
-  test('[POST] /auth/register - should return 400 for short password', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        name: 'Test User',
-        email: 'test@example.com',
-        password: '123',
+        password: '',
       });
 
     expect(response.statusCode).toBe(400);
