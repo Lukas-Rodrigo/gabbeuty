@@ -1,3 +1,4 @@
 import { config } from 'dotenv';
 
-config({ path: '.env.test' });
+// Carrega .env.test, mas NÃO sobrescreve variáveis já definidas (ex: CI)
+config({ path: '.env.test', override: false });
