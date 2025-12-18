@@ -12,18 +12,42 @@ import { BullQueueProvider } from './bull-queue.provider';
   imports: [
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('REDIS_HOST', 'localhost'),
-          port: configService.get('REDIS_PORT', 6379),
-          password: configService.get('REDIS_PASSWORD'),
-          maxRetriesPerRequest: null,
-        },
-        defaultJobOptions: {
-          removeOnComplete: 100,
-          removeOnFail: false,
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const redisUrl = configService.get('REDIS_URL');
+
+        if (redisUrl) {
+          try {
+            const url = new URL(redisUrl);
+            return {
+              redis: {
+                host: url.hostname,
+                port: parseInt(url.port) || 6379,
+                password: url.password || undefined,
+                maxRetriesPerRequest: null,
+              },
+              defaultJobOptions: {
+                removeOnComplete: 100,
+                removeOnFail: false,
+              },
+            };
+          } catch (error) {
+            console.error('Error parsing REDIS_URL:', error);
+          }
+        }
+
+        return {
+          redis: {
+            host: configService.get('REDIS_HOST', 'localhost'),
+            port: configService.get('REDIS_PORT', 6379),
+            password: configService.get('REDIS_PASSWORD'),
+            maxRetriesPerRequest: null,
+          },
+          defaultJobOptions: {
+            removeOnComplete: 100,
+            removeOnFail: false,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
 
