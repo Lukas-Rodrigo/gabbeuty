@@ -1,11 +1,37 @@
-version: "3.8"
+version: '3.8'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gabbeuty-app
+    ports:
+      - '3333:3333'
+    environment:
+      - DATABASE_URL=postgresql://${DATABASE_USER:-postgres}:${DATABASE_PASSWORD:-postgres}@postgres:5432/${DATABASE_NAME:-gabbeuty}?schema=public
+      - PORT=${PORT:-3333}
+      - NODE_ENV=${NODE_ENV:-production}
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - REDIS_URL=redis://${REDIS_PASSWORD:+:${REDIS_PASSWORD}@}redis:6379
+    volumes:
+      - whatsapp_sessions:/app/sessions
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gabbeuty-network
+    restart: unless-stopped
+    command: node dist/main
+
   redis:
     image: redis:7-alpine
     container_name: gabbeuty-redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     command: >
@@ -21,18 +47,18 @@ services:
     networks:
       - gabbeuty-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 3s
       retries: 3
     restart: unless-stopped
 
-  # PostgreSQL para aplicação (se necessário)
+  # PostgreSQL para aplicação
   postgres:
     image: postgres:15-alpine
     container_name: gabbeuty-postgres
     ports:
-      - "5432:5432"
+      - '5433:5432' # Porta externa 5433, interna 5432
     environment:
       - POSTGRES_USER=${DATABASE_USER:-postgres}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
@@ -42,7 +68,7 @@ services:
     networks:
       - gabbeuty-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-postgres}']
       interval: 10s
       timeout: 3s
       retries: 3
@@ -52,6 +78,8 @@ volumes:
   redis_data:
     driver: local
   postgres_data:
+    driver: local
+  whatsapp_sessions:
     driver: local
 
 networks:

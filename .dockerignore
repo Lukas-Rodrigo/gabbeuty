@@ -1,0 +1,58 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+build
+.next
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+compose.yml
+docker-compose.yml
+
+# Documentation
+*.md
+docs
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Temporary files
+tmp
+temp
+*.tmp
