@@ -206,7 +206,10 @@ ${timeFormatted}
   } {
     const appointmentDate = new Date(date);
 
+    const timeZone = 'America/Sao_Paulo';
+
     const dateFormatted = appointmentDate.toLocaleDateString('pt-BR', {
+      timeZone,
       weekday: 'long',
       day: '2-digit',
       month: 'long',
@@ -214,6 +217,7 @@ ${timeFormatted}
     });
 
     const timeFormatted = appointmentDate.toLocaleTimeString('pt-BR', {
+      timeZone,
       hour: '2-digit',
       minute: '2-digit',
     });
