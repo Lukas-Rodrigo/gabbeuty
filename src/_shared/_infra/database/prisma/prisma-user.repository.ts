@@ -3,7 +3,7 @@ import { User } from '@/modules/auth/domain/entities/user.entity';
 import { UserRepository } from '@/_shared/repositories/user.repository';
 import { randomUUID } from 'crypto';
 import { PrismaUserMapper } from './mapper/prisma-user.mapper';
-import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
+import { PrismaProvider } from './prisma.provider';
 
 @Injectable()
 export class PrismaUsersRepository implements UserRepository {

@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '../value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '../entities/value-objects/unique-entity-id.vo';
 
 export interface DomainEvent {
   occurredAt: Date;
