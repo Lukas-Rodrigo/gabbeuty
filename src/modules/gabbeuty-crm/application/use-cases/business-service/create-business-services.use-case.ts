@@ -1,7 +1,7 @@
 import { Either, left, right } from '@/_shared/either';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { UserRepository } from '@/_shared/repositories/user.repository';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
 import { BusinessServicesRepository } from '@/modules/gabbeuty-crm/domain/repositories/business-services.repository';
 import { Injectable } from '@nestjs/common';

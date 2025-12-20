@@ -6,7 +6,7 @@ import { PatchAppointmentUseCase } from './patch-appointment.use-case';
 import { faker } from '@faker-js/faker';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { AppointmentStatus } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-status.vo';
 import { AppointmentServiceList } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appoinment-service-list';

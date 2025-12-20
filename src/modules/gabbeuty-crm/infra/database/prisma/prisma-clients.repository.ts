@@ -1,10 +1,10 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
-import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
 import { ClientsRepository } from '@/modules/gabbeuty-crm/domain/repositories/clients.repository';
 import { Injectable } from '@nestjs/common';
 import { PrismaClientMapper } from './mapper/prisma-client-mapper';
+import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider';
 @Injectable()
 export class PrismaClientsRepository implements ClientsRepository {
   constructor(private prismaService: PrismaProvider) {}

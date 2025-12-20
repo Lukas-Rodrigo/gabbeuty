@@ -1,4 +1,4 @@
-import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
+import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider';
 import { RefreshToken } from '@/modules/auth/domain/entities/refresh-token';
 import { RefreshTokenRepository } from '@/modules/auth/domain/repositories/refresh-token.repository';
 import { Injectable } from '@nestjs/common';

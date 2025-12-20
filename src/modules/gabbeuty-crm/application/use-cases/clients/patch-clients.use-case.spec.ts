@@ -3,7 +3,7 @@ import { InMemoryUserRepository } from 'test/repositories/in-memory-user-reposit
 import { PatchClientsUseCase } from './patch-clients.use-case';
 import { faker } from '@faker-js/faker';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { AlreadyExists } from '@/_shared/errors/already-exists.error';
 import { NotBelongsError } from '@/_shared/errors/not-belongs.error';

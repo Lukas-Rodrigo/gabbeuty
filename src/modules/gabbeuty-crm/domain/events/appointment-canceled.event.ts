@@ -1,6 +1,6 @@
 import { DomainEvent } from '@/_shared/event/domain-event';
 import { AppointmentStatus } from '../entities/value-objects/appointment-status.vo';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 
 export interface AppointmentCanceledEventPayload {
   appointmentId: string;

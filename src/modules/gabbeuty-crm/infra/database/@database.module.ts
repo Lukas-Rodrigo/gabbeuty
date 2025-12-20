@@ -1,4 +1,3 @@
-import { SharedDatabaseModule } from '@/infra/database/@database.module';
 import { Module } from '@nestjs/common';
 import { AppointmentsRepository } from '../../domain/repositories/appointments.repository';
 import { PrismaAppointmentRepository } from './prisma/prisma-appointments.repository';
@@ -6,6 +5,7 @@ import { BusinessServicesRepository } from '../../domain/repositories/business-s
 import { PrismaBusinessServiceRepository } from './prisma/prisma-business-services-repository';
 import { ClientsRepository } from '../../domain/repositories/clients.repository';
 import { PrismaClientsRepository } from './prisma/prisma-clients.repository';
+import { SharedDatabaseModule } from '@/_shared/_infra/database/@database.module';
 
 @Module({
   imports: [SharedDatabaseModule],

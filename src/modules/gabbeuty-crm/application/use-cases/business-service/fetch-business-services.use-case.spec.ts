@@ -3,7 +3,7 @@ import { InMemoryUserRepository } from 'test/repositories/in-memory-user-reposit
 import { FetchBusinessServicesUseCase } from './fetch-business-services.use-case';
 import { faker } from '@faker-js/faker';
 import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 
 describe('[Unit] FetchBusinessServicesUseCase', () => {

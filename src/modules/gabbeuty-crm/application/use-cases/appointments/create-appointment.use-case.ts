@@ -2,7 +2,7 @@ import { Either, left, right } from '@/_shared/either';
 import { NotBelongsError } from '@/_shared/errors/not-belongs.error';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { UserRepository } from '@/_shared/repositories/user.repository';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
 import { AppointmentServiceList } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appoinment-service-list';
 import { AppointmentService } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-service';

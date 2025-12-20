@@ -4,8 +4,8 @@ import { envSchema } from './env';
 import { AuthModule } from './modules/auth/infra/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
-import { BullConfigModule } from './infra/queue/bull/bull-config.module';
 import { GabbeutyCrmModule } from './modules/gabbeuty-crm/infra/gabbeuty-crm.module';
+import { BullConfigModule } from './_shared/_infra/queue/bull/bull-config.module';
 
 @Module({
   imports: [

@@ -1,4 +1,4 @@
-import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
+import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider';
 import { PhoneNumber } from '@/modules/whatsapp/domain/entities/value-object/phone-number';
 import { QRCode } from '@/modules/whatsapp/domain/entities/value-object/qr-code';
 import {

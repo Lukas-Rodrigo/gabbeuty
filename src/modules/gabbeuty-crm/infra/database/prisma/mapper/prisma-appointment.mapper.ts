@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
 import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
