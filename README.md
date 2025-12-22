@@ -4,6 +4,7 @@
 
 ### Sistema de Gestão para Profissionais de Beleza
 
+[![CI](https://github.com/Lukas-Rodrigo/gabbeuty/workflows/CI/badge.svg)](https://github.com/Lukas-Rodrigo/gabbeuty/actions)
 [![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
