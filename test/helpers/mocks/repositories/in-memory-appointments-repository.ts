@@ -1,23 +1,65 @@
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 import { AppointmentMetrics } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-metrics.vo';
 import { AppointmentStatus } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-status.vo';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
+import { InMemoryClientsRepository } from './in-memory-clients-repository';
+import { InMemoryBusinessServicesRepository } from './in-memory-business-services-repository';
+import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
 
 export class InMemoryAppointmentsRepository implements AppointmentsRepository {
   public appointments: Appointment[] = [];
 
-  async create(appointment: Appointment): Promise<void> {
+  constructor(
+    private clientsRepository?: InMemoryClientsRepository,
+    private businessServicesRepository?: InMemoryBusinessServicesRepository,
+  ) {}
+
+  async create(appointment: Appointment): Promise<AppointmentDetailsView> {
     this.appointments.push(appointment);
+    return this.buildAppointmentDetailsView(appointment);
   }
 
-  async save(appointmentId: string, appointment: Appointment): Promise<void> {
+  async save(
+    appointmentId: string,
+    appointment: Appointment,
+  ): Promise<AppointmentDetailsView> {
     const index = this.appointments.findIndex(
       (appt) => appt.id.toValue() === appointmentId,
     );
     if (index !== -1) {
       this.appointments[index] = appointment;
     }
+    return this.buildAppointmentDetailsView(appointment);
+  }
+
+  private async buildAppointmentDetailsView(
+    appointment: Appointment,
+  ): Promise<AppointmentDetailsView> {
+    const client = this.clientsRepository
+      ? await this.clientsRepository.findById(appointment.clientId.toValue())
+      : null;
+
+    const serviceIds = appointment.services
+      .getItems()
+      .map((s) => s.serviceId.toValue());
+    const services: BusinessService[] = [];
+
+    if (this.businessServicesRepository && serviceIds.length > 0) {
+      for (const serviceId of serviceIds) {
+        const service =
+          await this.businessServicesRepository.findById(serviceId);
+        if (service) {
+          services.push(service);
+        }
+      }
+    }
+
+    return AppointmentDetailsView.create({
+      appointment,
+      client: client!,
+      services,
+    });
   }
 
   async findById(appointmentId: string): Promise<Appointment | null> {
@@ -100,10 +142,20 @@ export class InMemoryAppointmentsRepository implements AppointmentsRepository {
     });
   }
 
-  async fetchAppointmentsWithClientByProfessionalId(): Promise<
-    AppointmentDetails[]
-  > {
-    // For in-memory testing, return empty array (full implementation needs database joins)
-    return [] as AppointmentDetails[];
+  async fetchAppointmentsWithClientByProfessionalId(
+    professionalId: string,
+  ): Promise<AppointmentDetailsView[]> {
+    const appointments = this.appointments.filter(
+      (appt) => appt.professionalId.toValue() === professionalId,
+    );
+
+    const appointmentDetailsViews: AppointmentDetailsView[] = [];
+
+    for (const appointment of appointments) {
+      const detailsView = await this.buildAppointmentDetailsView(appointment);
+      appointmentDetailsViews.push(detailsView);
+    }
+
+    return appointmentDetailsViews;
   }
 }

@@ -5,8 +5,9 @@ import { BusinessServicesRepository } from '@/modules/gabbeuty-crm/domain/reposi
 export class InMemoryBusinessServicesRepository implements BusinessServicesRepository {
   public businessServices: BusinessService[] = [];
 
-  async create(businessService: BusinessService): Promise<void> {
+  async create(businessService: BusinessService): Promise<BusinessService> {
     this.businessServices.push(businessService);
+    return businessService;
   }
 
   async save(id: string, businessService: BusinessService): Promise<void> {
