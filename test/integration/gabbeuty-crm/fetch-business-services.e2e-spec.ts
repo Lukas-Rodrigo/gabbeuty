@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Fetch Business Services (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -30,6 +31,8 @@ describe('Fetch Business Services (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -41,11 +44,13 @@ describe('Fetch Business Services (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -53,7 +58,7 @@ describe('Fetch Business Services (E2E)', () => {
   test('[GET] /business-services', async () => {
     await request(app.getHttpServer())
       .post('/business-services')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Service 1',
         price: 50.0,
@@ -61,7 +66,7 @@ describe('Fetch Business Services (E2E)', () => {
 
     await request(app.getHttpServer())
       .post('/business-services')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Service 2',
         price: 75.0,
@@ -69,7 +74,7 @@ describe('Fetch Business Services (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .get('/business-services')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('businessServices');
@@ -88,7 +93,7 @@ describe('Fetch Business Services (E2E)', () => {
   test('[GET] /business-services - should support pagination', async () => {
     const response = await request(app.getHttpServer())
       .get('/business-services?page=1&perPage=1')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.businessServices.length).toBeLessThanOrEqual(1);

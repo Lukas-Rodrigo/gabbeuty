@@ -1,9 +1,10 @@
-import { AppModule } from '@/app.module';
 import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
+import { AppModule } from '@/app.module';
 
 describe('Login User (E2E)', () => {
   let app: INestApplication;
@@ -30,11 +31,12 @@ describe('Login User (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -50,10 +52,17 @@ describe('Login User (E2E)', () => {
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('accessToken');
-    expect(response.body).toHaveProperty('refreshToken');
-    expect(typeof response.body.accessToken).toBe('string');
-    expect(typeof response.body.refreshToken).toBe('string');
+    expect(response.body).toHaveProperty('message');
+    expect(response.headers['set-cookie']).toBeDefined();
+    const cookies = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']];
+    expect(
+      cookies.some((cookie: string) => cookie.includes('access_token')),
+    ).toBe(true);
+    expect(
+      cookies.some((cookie: string) => cookie.includes('refresh_token')),
+    ).toBe(true);
   });
 
   test('[POST] /auth/login - should return 404 for wrong password', async () => {

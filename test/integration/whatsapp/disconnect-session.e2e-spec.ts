@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Disconnect WhatsApp Session (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,6 +32,8 @@ describe('Disconnect WhatsApp Session (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -42,11 +45,13 @@ describe('Disconnect WhatsApp Session (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -54,7 +59,7 @@ describe('Disconnect WhatsApp Session (E2E)', () => {
   test('[POST] /whatsapp/disconnect', async () => {
     const response = await request(app.getHttpServer())
       .post('/whatsapp/disconnect')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send();
 
     expect([200, 404]).toContain(response.statusCode);
@@ -74,7 +79,7 @@ describe('Disconnect WhatsApp Session (E2E)', () => {
   test('[POST] /whatsapp/disconnect - should return 401 with invalid token', async () => {
     const response = await request(app.getHttpServer())
       .post('/whatsapp/disconnect')
-      .set('Authorization', 'Bearer invalid-token')
+      .set('Cookie', ['invalid-cookie'])
       .send();
 
     expect(response.statusCode).toBe(401);

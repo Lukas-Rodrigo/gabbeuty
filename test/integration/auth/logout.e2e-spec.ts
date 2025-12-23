@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Logout User (E2E)', () => {
   let app: INestApplication;
@@ -30,11 +31,12 @@ describe('Logout User (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -49,7 +51,15 @@ describe('Logout User (E2E)', () => {
         password: user.plainPassword,
       });
 
-    const { refreshToken } = loginResponse.body;
+    const cookies = Array.isArray(loginResponse.headers['set-cookie'])
+      ? loginResponse.headers['set-cookie']
+      : [loginResponse.headers['set-cookie']];
+    const refreshTokenCookie = cookies.find((cookie: string) =>
+      cookie.includes('refresh_token='),
+    );
+    const refreshToken = refreshTokenCookie
+      ?.split('refresh_token=')[1]
+      ?.split(';')[0];
 
     const response = await request(app.getHttpServer())
       .post('/auth/logout')

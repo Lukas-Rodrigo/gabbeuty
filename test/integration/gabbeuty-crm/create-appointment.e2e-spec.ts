@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Create Appointment (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
   let userId: string;
 
   beforeAll(async () => {
@@ -31,6 +32,8 @@ describe('Create Appointment (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -43,11 +46,13 @@ describe('Create Appointment (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -71,10 +76,10 @@ describe('Create Appointment (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         clientId: client.id,
-        date: '2025-12-20T15:30:00.000Z',
+        date: '2026-12-25T15:30:00.000Z',
         servicesIds: [{ id: service.id }],
         status: 'PENDING',
       });
@@ -87,7 +92,7 @@ describe('Create Appointment (E2E)', () => {
       .post('/appointments')
       .send({
         clientId: '123e4567-e89b-12d3-a456-426614174000',
-        date: '2025-12-20T15:30:00.000Z',
+        date: '2025-12-25T15:30:00.000Z',
         servicesIds: [{ id: '123e4567-e89b-12d3-a456-426614174001' }],
       });
 
@@ -97,9 +102,9 @@ describe('Create Appointment (E2E)', () => {
   test('[POST] /appointments - should return 400 for missing clientId', async () => {
     const response = await request(app.getHttpServer())
       .post('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
-        date: '2025-12-20T15:30:00.000Z',
+        date: '2025-12-25T15:30:00.000Z',
         servicesIds: [{ id: '123e4567-e89b-12d3-a456-426614174001' }],
       });
 
@@ -109,10 +114,10 @@ describe('Create Appointment (E2E)', () => {
   test('[POST] /appointments - should return 400 for empty servicesIds', async () => {
     const response = await request(app.getHttpServer())
       .post('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         clientId: '123e4567-e89b-12d3-a456-426614174000',
-        date: '2025-12-20T15:30:00.000Z',
+        date: '2025-12-25T15:30:00.000Z',
         servicesIds: [],
       });
 
