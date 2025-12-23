@@ -15,8 +15,8 @@ describe('[Unit] FetchAppointmentMetricsUseCase', () => {
   let sut: FetchAppointmentMetricsUseCase;
 
   beforeEach(() => {
-    appointmentsRepository = new InMemoryAppointmentsRepository();
     userRepository = new InMemoryUserRepository();
+    appointmentsRepository = new InMemoryAppointmentsRepository();
     sut = new FetchAppointmentMetricsUseCase(
       userRepository,
       appointmentsRepository,

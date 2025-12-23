@@ -44,7 +44,7 @@ describe('[Unit] PatchBusinessServicesUseCase', () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.service.name).toBe('New Service');
+      expect(result.value.businessService.name).toBe('New Service');
     }
   });
 
@@ -71,7 +71,7 @@ describe('[Unit] PatchBusinessServicesUseCase', () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.service.price).toBe(75);
+      expect(result.value.businessService.price).toBe(75);
     }
   });
 

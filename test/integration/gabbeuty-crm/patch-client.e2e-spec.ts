@@ -81,9 +81,9 @@ describe('Patch Client (E2E)', () => {
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('client');
-    expect(response.body.client.props.name).toBe('Updated Client Name');
-    expect(response.body.client.props.observation).toBe('New observation');
+    expect(response.body).toHaveProperty('name');
+    expect(response.body.name).toBe('Updated Client Name');
+    expect(response.body.observation).toBe('New observation');
   });
 
   test('[PATCH] /clients/:id - should return 401 without token', async () => {
@@ -104,7 +104,7 @@ describe('Patch Client (E2E)', () => {
         name: 'Updated Name',
       });
 
-    expect(response.statusCode).toBe(409);
+    expect(response.statusCode).toBe(404);
   });
 
   test('[PATCH] /clients/:id - should return 400 for invalid phone', async () => {

@@ -19,10 +19,13 @@ describe('[Unit] PatchAppointmentUseCase', () => {
   let sut: PatchAppointmentUseCase;
 
   beforeEach(() => {
-    appointmentsRepository = new InMemoryAppointmentsRepository();
     userRepository = new InMemoryUserRepository();
     clientsRepository = new InMemoryClientsRepository();
     businessServicesRepository = new InMemoryBusinessServicesRepository();
+    appointmentsRepository = new InMemoryAppointmentsRepository(
+      clientsRepository,
+      businessServicesRepository,
+    );
     sut = new PatchAppointmentUseCase(
       userRepository,
       appointmentsRepository,
@@ -65,7 +68,9 @@ describe('[Unit] PatchAppointmentUseCase', () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.appointment.status).toBe(AppointmentStatus.CONFIRMED);
+      expect(result.value.appointmentDetailsView.appointment.status).toBe(
+        AppointmentStatus.CONFIRMED,
+      );
     }
   });
 
@@ -132,10 +137,12 @@ describe('[Unit] PatchAppointmentUseCase', () => {
       professionalId,
       date: newDate,
     });
-
+    console.log(result);
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.appointment.date.getTime()).toBe(newDate.getTime());
+      expect(
+        result.value.appointmentDetailsView.appointment.date.getTime(),
+      ).toBe(newDate.getTime());
     }
   });
 });
