@@ -21,6 +21,7 @@ import { CreateClientDto } from '../dto/create-client.dto';
 import { FetchClientsQueriesDto } from '../dto/fetch-clients-queries.dto';
 import { PatchClientDto } from '../dto/patch-clients.dto';
 import { ClientsApiDoc } from '@/_shared/docs/swagger.decorators';
+import { ClientPresenter } from '../presenters/client-presenter';
 
 @Controller('clients')
 export class ClientsController {
@@ -48,6 +49,10 @@ export class ClientsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
+
+    const { client } = result.value;
+
+    return ClientPresenter.toHTTP(client);
   }
 
   @ClientsApiDoc.Update()
@@ -60,7 +65,7 @@ export class ClientsController {
   ) {
     const { name, phoneNumber, observation, profileUrl } = body;
 
-    const result = await this.patchClientsUseCase.handle({
+    const result = await this.patchClientsUseCase.execute({
       professionalId: user.sub,
       clientId,
       data: {
@@ -74,8 +79,8 @@ export class ClientsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-
-    return result.value;
+    const { client } = result.value;
+    return ClientPresenter.toHTTP(client);
   }
 
   @ClientsApiDoc.Fetch()
@@ -100,7 +105,18 @@ export class ClientsController {
       throw mapDomainErrorToHttpException(result.value);
     }
 
-    return result.value;
+    const { clients } = result.value;
+    return ClientPresenter.toFetchHTTP({
+      clients,
+      dateRange: {
+        endDate,
+        startDate,
+      },
+      pagination: {
+        perPage,
+        page,
+      },
+    });
   }
 
   @ClientsApiDoc.Delete()

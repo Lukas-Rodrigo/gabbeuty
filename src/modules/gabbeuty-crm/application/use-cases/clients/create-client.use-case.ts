@@ -13,7 +13,12 @@ export interface CreateClientRequest {
   professionalId: string;
 }
 
-type CreateClientResponse = Either<AlreadyExists, null>;
+type CreateClientResponse = Either<
+  AlreadyExists,
+  {
+    client: Client;
+  }
+>;
 
 @Injectable()
 export class CreateClientUseCase {
@@ -39,7 +44,9 @@ export class CreateClientUseCase {
       professionalId: new UniqueEntityID(professionalId),
       profileUrl,
     });
-    await this.clientsRepository.create(newClient);
-    return right(null);
+    const client = await this.clientsRepository.create(newClient);
+    return right({
+      client,
+    });
   }
 }

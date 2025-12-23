@@ -3,9 +3,9 @@ import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { Client } from '../entities/client.entity';
 
 export abstract class ClientsRepository {
-  abstract create(client: Client): Promise<void>;
+  abstract create(client: Client): Promise<Client>;
   abstract delete(clientId: string): Promise<void>;
-  abstract save(clientId: string, updateClient: Client): Promise<void>;
+  abstract save(clientId: string, updateClient: Client): Promise<Client>;
   abstract findByPhoneNumber(phoneNumber: string): Promise<Client | null>;
   abstract findById(clientId: string): Promise<Client | null>;
   abstract findByProfessionalId(

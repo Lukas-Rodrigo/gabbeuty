@@ -31,7 +31,7 @@ export class PatchClientsUseCase {
     private userRepository: UserRepository,
     private clientsRepository: ClientsRepository,
   ) {}
-  async handle({
+  async execute({
     professionalId,
     clientId,
     data,
@@ -86,10 +86,10 @@ export class PatchClientsUseCase {
       isValidClient.profileUrl = profileUrl;
     }
 
-    await this.clientsRepository.save(clientId, isValidClient);
+    const client = await this.clientsRepository.save(clientId, isValidClient);
 
     return right({
-      client: isValidClient,
+      client: client,
     });
   }
 }

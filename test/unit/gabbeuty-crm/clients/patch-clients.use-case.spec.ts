@@ -33,7 +33,7 @@ describe('[Unit] PatchClientsUseCase', () => {
     });
     await clientsRepository.create(client);
 
-    const result = await sut.handle({
+    const result = await sut.execute({
       clientId: client.id.toValue(),
       professionalId: user.id.toValue(),
       data: { name: 'New Name' },
@@ -46,7 +46,7 @@ describe('[Unit] PatchClientsUseCase', () => {
   });
 
   it('should return error if professional not found', async () => {
-    const result = await sut.handle({
+    const result = await sut.execute({
       clientId: faker.string.uuid(),
       professionalId: faker.string.uuid(),
       data: { name: 'Test' },
@@ -63,7 +63,7 @@ describe('[Unit] PatchClientsUseCase', () => {
       'password123',
     );
 
-    const result = await sut.handle({
+    const result = await sut.execute({
       clientId: faker.string.uuid(),
       professionalId: user.id.toValue(),
       data: { name: 'Test' },
@@ -93,7 +93,7 @@ describe('[Unit] PatchClientsUseCase', () => {
     });
     await clientsRepository.create(client);
 
-    const result = await sut.handle({
+    const result = await sut.execute({
       clientId: client.id.toValue(),
       professionalId: user2.id.toValue(),
       data: { name: 'New Name' },
@@ -124,7 +124,7 @@ describe('[Unit] PatchClientsUseCase', () => {
     });
     await clientsRepository.create(client2);
 
-    const result = await sut.handle({
+    const result = await sut.execute({
       clientId: client2.id.toValue(),
       professionalId: user.id.toValue(),
       data: {
