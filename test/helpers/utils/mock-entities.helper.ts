@@ -47,12 +47,4 @@ export class MockEntities {
       },
     });
   }
-
-  async cleanupAll() {
-    await this.prisma.refreshToken.deleteMany();
-    await this.prisma.appointment.deleteMany();
-    await this.prisma.businessService.deleteMany();
-    await this.prisma.client.deleteMany();
-    await this.prisma.user.deleteMany();
-  }
 }
