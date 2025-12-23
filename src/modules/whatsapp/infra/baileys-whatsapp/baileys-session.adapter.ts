@@ -1,4 +1,3 @@
-import { TypedEventEmitter } from '@/infra/events/types/event-emitter.types';
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as fs from 'fs/promises';
@@ -19,6 +18,7 @@ import pino from 'pino';
 import { WhatsappStartSession } from '../../domain/event/whatsapp-start-session.event';
 import { WhatsAppMessageEvent } from '../../domain/event/whatsapp-message.event';
 import { PhoneNumber } from '../../domain/entities/value-object/phone-number';
+import { TypedEventEmitter } from '@/_shared/_infra/events/types/event-emitter.types';
 
 export class BaileysSessionAdapter {
   private readonly logger = new Logger(BaileysSessionAdapter.name);

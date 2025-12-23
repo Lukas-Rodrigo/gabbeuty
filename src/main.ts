@@ -14,7 +14,6 @@ async function bootstrap() {
   const configService = app.get<ConfigService<Env, true>>(ConfigService);
   const port = configService.get('PORT', { infer: true });
 
-  // Setup Swagger documentation
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document, {
     customSiteTitle: 'Gabbeuty API Documentation',

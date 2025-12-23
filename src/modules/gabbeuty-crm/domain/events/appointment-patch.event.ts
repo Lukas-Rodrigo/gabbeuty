@@ -1,5 +1,5 @@
 import { DomainEvent } from '@/_shared/event/domain-event';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { AppointmentStatus } from '../entities/value-objects/appointment-status.vo';
 
 export interface AppointmentPatchPayload {

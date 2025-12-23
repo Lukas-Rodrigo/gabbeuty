@@ -1,25 +1,24 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
-import { PrismaProvider } from '@/infra/database/prisma/prisma.provider';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
 import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
 import { PrismaAppointmentMapper } from './mapper/prisma-appointment.mapper';
 import { DomainEvents } from '@/_shared/event/domain-events';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { Injectable } from '@nestjs/common';
 import { AppointmentMetrics } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-metrics.vo';
 import { AppointmentStatus } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-status.vo';
+import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider';
 
 @Injectable()
 export class PrismaAppointmentRepository implements AppointmentsRepository {
   constructor(private prismaService: PrismaProvider) {}
 
   async save(appointmentId: string, appointment: Appointment): Promise<void> {
-    // ✅ 1. Preparar dados para update
     const servicesData = PrismaAppointmentMapper.servicesToPrisma(appointment);
 
-    // ✅ 2. Executar tudo em uma transação atômica
+    //  2. Executar tudo em uma transação atômica
     await this.prismaService.$transaction([
       // 2.1. Atualizar dados principais do appointment
       this.prismaService.appointment.update({

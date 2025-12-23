@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { AppointmentStatus } from './value-objects/appointment-status.vo';
 import { AppointmentServiceList } from './value-objects/appoinment-service-list';
 import { AggregateRoot } from '@/_shared/event/aggregate-root';

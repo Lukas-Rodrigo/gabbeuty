@@ -1,7 +1,7 @@
 import { left } from '@/_shared/either';
 import { Entity } from '@/_shared/entities/base-entity.entity';
 import { Optional } from '@/_shared/types/optinal';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 
 export interface BusinessServiceProps {
   name: string;

@@ -1,6 +1,6 @@
 import { Either, left, right } from '@/_shared/either';
 import { AlreadyExists } from '@/_shared/errors/already-exists.error';
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
 import { ClientsRepository } from '@/modules/gabbeuty-crm/domain/repositories/clients.repository';
 import { Injectable } from '@nestjs/common';

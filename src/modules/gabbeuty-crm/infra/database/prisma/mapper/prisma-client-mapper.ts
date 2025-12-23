@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '@/_shared/value-objects/unique-entity-id.vo';
+import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
 import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
 import { Client as PrismaClient } from '@prisma/client';
 
