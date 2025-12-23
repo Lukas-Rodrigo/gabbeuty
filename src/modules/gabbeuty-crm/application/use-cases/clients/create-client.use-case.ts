@@ -34,7 +34,11 @@ export class CreateClientUseCase {
     const clientFound =
       await this.clientsRepository.findByPhoneNumber(phoneNumber);
 
-    if (clientFound && name === clientFound.name) {
+    if (
+      clientFound?.professionalId.toValue() === professionalId &&
+      clientFound.name === name &&
+      clientFound.phoneNumber === phoneNumber
+    ) {
       return left(new AlreadyExists({ msg: 'Client already exists.' }));
     }
     const newClient = Client.create({
