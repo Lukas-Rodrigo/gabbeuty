@@ -27,6 +27,7 @@ import { PatchAppointmentUseCase } from '@/modules/gabbeuty-crm/application/use-
 import { UUIDParamDto } from '../dto/uuid-param.dto';
 import { PatchAppointmentDto } from '../dto/patch-appointments.dto';
 import { AppointmentsApiDoc } from '@/_shared/docs/swagger.decorators';
+import { AppointmentPresenter } from '../presenters/appointment-presenter';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -65,7 +66,8 @@ export class AppointmentsController {
       throw mapDomainErrorToHttpException(result.value);
     }
 
-    return result.value;
+    const { appointment } = result.value;
+    return AppointmentPresenter.toHTTP(appointment);
   }
 
   @AppointmentsApiDoc.Update()
@@ -97,8 +99,8 @@ export class AppointmentsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-
-    return result.value;
+    const { appointment } = result.value;
+    return AppointmentPresenter.toHTTP(appointment);
   }
 
   @AppointmentsApiDoc.Fetch()
@@ -122,7 +124,19 @@ export class AppointmentsController {
       throw mapDomainErrorToHttpException(result.value);
     }
 
-    return result.value;
+    const { appointments } = result.value;
+
+    return AppointmentPresenter.toFetchHTTP({
+      appointmentDetails: appointments,
+      dateRange: {
+        endDate,
+        startDate,
+      },
+      pagination: {
+        page,
+        perPage,
+      },
+    });
   }
 
   @AppointmentsApiDoc.CountByStatus()
@@ -151,7 +165,16 @@ export class AppointmentsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-    return result.value;
+
+    const { total } = result.value;
+
+    return AppointmentPresenter.toCountHTTP({
+      total,
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    });
   }
 
   @AppointmentsApiDoc.FetchMetrics()
@@ -177,7 +200,14 @@ export class AppointmentsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-    return result.value;
+    const { metrics } = result.value;
+    return AppointmentPresenter.metricsToHTTP({
+      metrics,
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    });
   }
 
   @AppointmentsApiDoc.FetchInvoicing()
@@ -200,6 +230,13 @@ export class AppointmentsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-    return result.value;
+    const { invoicing } = result.value;
+    return AppointmentPresenter.invoicingToHTTP({
+      invoicing,
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    });
   }
 }
