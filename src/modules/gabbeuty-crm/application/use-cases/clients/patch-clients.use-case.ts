@@ -49,7 +49,7 @@ export class PatchClientsUseCase {
     const isValidClient = await this.clientsRepository.findById(clientId);
 
     if (!isValidClient) {
-      return left(new AlreadyExists({ msg: 'Client already exists.' }));
+      return left(new ResourceNotFoundError({ msg: 'Client not found.' }));
     }
 
     if (isValidClient.professionalId.toValue() !== professionalId) {
@@ -65,16 +65,15 @@ export class PatchClientsUseCase {
     }
 
     if (phoneNumber !== undefined) {
-      const isPhoneNumberExists =
-        await this.clientsRepository.findByPhoneNumber(phoneNumber);
-
-      if (
-        isPhoneNumberExists?.professionalId.toValue() === professionalId &&
-        isPhoneNumberExists.id.toValue() !== clientId &&
-        isPhoneNumberExists.name === name
-      ) {
-        return left(new AlreadyExists({ msg: 'Client already exists.' }));
-      }
+      // const isPhoneNumberExists =
+      //   await this.clientsRepository.findByPhoneNumber(phoneNumber);
+      // if (
+      //   isPhoneNumberExists?.professionalId.toValue() === professionalId &&
+      //   isPhoneNumberExists.id.toValue() === clientId &&
+      //   isPhoneNumberExists.name === name
+      // ) {
+      //   return left(new AlreadyExists({ msg: 'Client already exists.' }));
+      // }
       isValidClient.phoneNumber = phoneNumber;
     }
 
