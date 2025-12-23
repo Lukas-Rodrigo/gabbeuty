@@ -42,7 +42,7 @@ export class InMemoryClientsRepository implements ClientsRepository {
     return client || null;
   }
 
-  async findByProfessionalId(
+  async fetchByProfessionalId(
     professionalId: string,
     dateRange: DateRange,
     pagination: PaginationParam,

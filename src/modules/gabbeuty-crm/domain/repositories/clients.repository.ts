@@ -8,7 +8,8 @@ export abstract class ClientsRepository {
   abstract save(clientId: string, updateClient: Client): Promise<Client>;
   abstract findByPhoneNumber(phoneNumber: string): Promise<Client | null>;
   abstract findById(clientId: string): Promise<Client | null>;
-  abstract findByProfessionalId(
+
+  abstract fetchByProfessionalId(
     professionalId: string,
     dateRange: DateRange,
     Pagination: PaginationParam,

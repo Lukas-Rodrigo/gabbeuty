@@ -71,7 +71,7 @@ export class PrismaClientsRepository implements ClientsRepository {
     return PrismaClientMapper.toDomain(clientFound);
   }
 
-  async findByProfessionalId(
+  async fetchByProfessionalId(
     professionalId: string,
     { startDate, endDate }: DateRange,
     { page, perPage }: PaginationParam,
