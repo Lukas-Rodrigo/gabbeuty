@@ -99,7 +99,7 @@ export class AppointmentsController {
     if (result.isLeft()) {
       throw mapDomainErrorToHttpException(result.value);
     }
-    const { appointment } = result.value;
+    const { appointmentDetailsView: appointment } = result.value;
     return AppointmentPresenter.toHTTP(appointment);
   }
 

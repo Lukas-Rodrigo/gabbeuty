@@ -1,10 +1,10 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { AppointmentMetrics } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-metrics.vo';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 
 export class AppointmentPresenter {
-  static toHTTP(appointmentDetails: AppointmentDetails) {
+  static toHTTP(appointmentDetails: AppointmentDetailsView) {
     const { appointment, client, services } = appointmentDetails;
     return {
       id: appointment.id.toValue(),
@@ -32,7 +32,7 @@ export class AppointmentPresenter {
     dateRange,
     pagination,
   }: {
-    appointmentDetails: AppointmentDetails[];
+    appointmentDetails: AppointmentDetailsView[];
     dateRange: DateRange;
     pagination: PaginationParam;
   }) {
