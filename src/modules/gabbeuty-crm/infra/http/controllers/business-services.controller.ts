@@ -22,6 +22,7 @@ import { PatchBusinessServicesBodyDto } from '../dto/patch-business-services-bod
 import { FiltersFetchQueriesDto } from '../dto/filters-fetch-queries.dto';
 import { BusinessServicesApiDoc } from '@/_shared/docs/swagger.decorators';
 import { ApiTags } from '@nestjs/swagger';
+import { BusinessServicePresenter } from '../presenters/business-service.presenter';
 
 @ApiTags('Business Services')
 @Controller('business-services')
@@ -47,10 +48,10 @@ export class BusinessServicesController {
       },
     });
     if (result.isLeft()) {
-      mapDomainErrorToHttpException(result.value);
+      throw mapDomainErrorToHttpException(result.value);
     }
-
-    return result.value;
+    const { businessService } = result.value;
+    return BusinessServicePresenter.toHTTP(businessService);
   }
 
   @BusinessServicesApiDoc.Update()
@@ -77,7 +78,8 @@ export class BusinessServicesController {
       throw mapDomainErrorToHttpException(result.value);
     }
 
-    return result.value;
+    const { businessService } = result.value;
+    return BusinessServicePresenter.toHTTP(businessService);
   }
 
   @BusinessServicesApiDoc.Fetch()
@@ -104,7 +106,19 @@ export class BusinessServicesController {
       throw mapDomainErrorToHttpException(result.value);
     }
 
-    return result.value;
+    const { businessServices } = result.value;
+
+    return BusinessServicePresenter.toFetchHTTP({
+      businessServices,
+      pagination: {
+        page,
+        perPage,
+      },
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    });
   }
 
   @BusinessServicesApiDoc.Delete()

@@ -3,7 +3,7 @@ import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { UserRepository } from '@/_shared/repositories/user.repository';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
 import { Injectable } from '@nestjs/common';
 
@@ -16,7 +16,7 @@ export interface FetchAppointmentUseCaseRequest {
 type FetchAppointmentUseCaseResponse = Either<
   ResourceNotFoundError,
   {
-    appointments: AppointmentDetails[];
+    appointments: AppointmentDetailsView[];
   }
 >;
 

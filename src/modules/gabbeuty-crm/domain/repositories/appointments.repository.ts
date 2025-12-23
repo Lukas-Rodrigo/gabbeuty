@@ -1,15 +1,18 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { Appointment } from '../entities/appointment.entity';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
-import { AppointmentDetails } from '../entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '../entities/value-objects/appointment-details-view';
 import { AppointmentStatus } from '../entities/value-objects/appointment-status.vo';
 import { AppointmentMetrics } from '../entities/value-objects/appointment-metrics.vo';
 
 export abstract class AppointmentsRepository {
   // used
-  abstract create(appointment: Appointment): Promise<void>;
+  abstract create(appointment: Appointment): Promise<AppointmentDetailsView>;
 
-  abstract save(appointmentId: string, appointment: Appointment): Promise<void>;
+  abstract save(
+    appointmentId: string,
+    appointment: Appointment,
+  ): Promise<AppointmentDetailsView>;
 
   abstract findById(appointmentId: string): Promise<Appointment | null>;
 
@@ -47,5 +50,5 @@ export abstract class AppointmentsRepository {
     professionalId: string,
     pagination: PaginationParam,
     dateRange: DateRange,
-  ): Promise<AppointmentDetails[]>;
+  ): Promise<AppointmentDetailsView[]>;
 }

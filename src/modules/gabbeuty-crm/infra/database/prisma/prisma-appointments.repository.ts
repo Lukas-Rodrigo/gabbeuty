@@ -1,7 +1,7 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
 import { PrismaAppointmentMapper } from './mapper/prisma-appointment.mapper';
 import { DomainEvents } from '@/_shared/event/domain-events';
@@ -15,7 +15,10 @@ import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider
 export class PrismaAppointmentRepository implements AppointmentsRepository {
   constructor(private prismaService: PrismaProvider) {}
 
-  async save(appointmentId: string, appointment: Appointment): Promise<void> {
+  async save(
+    appointmentId: string,
+    appointment: Appointment,
+  ): Promise<AppointmentDetailsView> {
     const servicesData = PrismaAppointmentMapper.servicesToPrisma(appointment);
 
     //  2. Executar tudo em uma transação atômica
@@ -61,19 +64,45 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
         : []),
     ]);
 
+    const appointmentPrisma = await this.prismaService.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        client: true,
+        appointmentServices: {
+          include: {
+            service: true,
+          },
+        },
+      },
+    });
+    if (!appointmentPrisma) {
+      throw new Error('Appointment not found after save');
+    }
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(appointmentId));
+
+    return PrismaAppointmentMapper.toDomainWithClient(appointmentPrisma);
   }
 
-  async create(appointment: Appointment): Promise<void> {
+  async create(appointment: Appointment): Promise<AppointmentDetailsView> {
     const data = PrismaAppointmentMapper.toPrisma(appointment);
 
     const newAppointment = await this.prismaService.appointment.create({
       data,
+      include: {
+        client: true,
+        appointmentServices: {
+          include: {
+            service: true,
+          },
+        },
+      },
     });
 
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(newAppointment.id),
     );
+
+    return PrismaAppointmentMapper.toDomainWithClient(newAppointment);
   }
 
   async findById(appointmentId: string): Promise<Appointment | null> {
@@ -118,7 +147,7 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
     professionalId: string,
     pagination: PaginationParam,
     dateRange: DateRange,
-  ): Promise<AppointmentDetails[]> {
+  ): Promise<AppointmentDetailsView[]> {
     const { page, perPage } = pagination;
     const { startDate, endDate } = dateRange;
     const appointments = await this.prismaService.appointment.findMany({

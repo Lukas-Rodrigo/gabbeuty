@@ -6,8 +6,9 @@ import { ClientsRepository } from '@/modules/gabbeuty-crm/domain/repositories/cl
 export class InMemoryClientsRepository implements ClientsRepository {
   public clients: Client[] = [];
 
-  async create(client: Client): Promise<void> {
+  async create(client: Client): Promise<Client> {
     this.clients.push(client);
+    return client;
   }
 
   async delete(clientId: string): Promise<void> {
@@ -19,12 +20,12 @@ export class InMemoryClientsRepository implements ClientsRepository {
     }
   }
 
-  async save(clientId: string, updateClient: Client): Promise<void> {
+  async save(clientId: string, updateClient: Client): Promise<Client> {
     const index = this.clients.findIndex(
       (client) => client.id.toValue() === clientId,
     );
     if (index !== -1) {
-      this.clients[index] = updateClient;
+      return (this.clients[index] = updateClient);
     }
   }
 
@@ -42,7 +43,7 @@ export class InMemoryClientsRepository implements ClientsRepository {
     return client || null;
   }
 
-  async findByProfessionalId(
+  async fetchByProfessionalId(
     professionalId: string,
     dateRange: DateRange,
     pagination: PaginationParam,

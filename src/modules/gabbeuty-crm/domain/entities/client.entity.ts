@@ -51,6 +51,10 @@ export class Client extends Entity<ClientProps> {
   }
 
   updateName(name: string) {
+    if (name === this.name) {
+      return;
+    }
+
     if (name.length < 3) {
       return left(Error('....'));
     }

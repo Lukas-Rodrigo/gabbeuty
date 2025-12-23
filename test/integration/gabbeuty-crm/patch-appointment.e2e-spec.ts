@@ -98,8 +98,8 @@ describe('Patch Appointment (E2E)', () => {
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('appointment');
-    expect(response.body.appointment.props.status).toBe('CONFIRMED');
+    expect(response.body).toHaveProperty('totalPrice');
+    expect(response.body.status).toBe('CONFIRMED');
   });
 
   test('[PATCH] /appointments/:id - should return 401 without token', async () => {

@@ -3,7 +3,7 @@ import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { BusinessService } from '../entities/business-service.entity';
 
 export abstract class BusinessServicesRepository {
-  abstract create(businessService: BusinessService): Promise<void>;
+  abstract create(businessService: BusinessService): Promise<BusinessService>;
   abstract save(id: string, businessService: BusinessService): Promise<void>;
   abstract findById(businessServiceId: string): Promise<BusinessService | null>;
   abstract findManyByIdsAndProfessionalId(

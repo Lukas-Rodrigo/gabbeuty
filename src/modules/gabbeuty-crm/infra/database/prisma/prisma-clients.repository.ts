@@ -9,22 +9,26 @@ import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider
 export class PrismaClientsRepository implements ClientsRepository {
   constructor(private prismaService: PrismaProvider) {}
 
-  async save(clientId: string, updateClient: Client): Promise<void> {
+  async save(clientId: string, updateClient: Client): Promise<Client> {
     const data = PrismaClientMapper.toPrisma(updateClient);
-    await this.prismaService.client.update({
+    const client = await this.prismaService.client.update({
       where: {
         id: clientId,
       },
       data,
     });
+
+    return PrismaClientMapper.toDomain(client);
   }
 
-  async create(client: Client): Promise<void> {
+  async create(client: Client): Promise<Client> {
     const newClient = PrismaClientMapper.toPrisma(client);
 
-    await this.prismaService.client.create({
+    const data = await this.prismaService.client.create({
       data: newClient,
     });
+
+    return PrismaClientMapper.toDomain(data);
   }
 
   async delete(clientId: string): Promise<void> {
@@ -67,7 +71,7 @@ export class PrismaClientsRepository implements ClientsRepository {
     return PrismaClientMapper.toDomain(clientFound);
   }
 
-  async findByProfessionalId(
+  async fetchByProfessionalId(
     professionalId: string,
     { startDate, endDate }: DateRange,
     { page, perPage }: PaginationParam,

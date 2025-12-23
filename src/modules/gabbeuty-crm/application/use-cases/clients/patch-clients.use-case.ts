@@ -31,7 +31,7 @@ export class PatchClientsUseCase {
     private userRepository: UserRepository,
     private clientsRepository: ClientsRepository,
   ) {}
-  async handle({
+  async execute({
     professionalId,
     clientId,
     data,
@@ -49,7 +49,7 @@ export class PatchClientsUseCase {
     const isValidClient = await this.clientsRepository.findById(clientId);
 
     if (!isValidClient) {
-      return left(new AlreadyExists({ msg: 'Client already exists.' }));
+      return left(new ResourceNotFoundError({ msg: 'Client not found.' }));
     }
 
     if (isValidClient.professionalId.toValue() !== professionalId) {
@@ -65,16 +65,15 @@ export class PatchClientsUseCase {
     }
 
     if (phoneNumber !== undefined) {
-      const isPhoneNumberExists =
-        await this.clientsRepository.findByPhoneNumber(phoneNumber);
-
-      if (
-        isPhoneNumberExists?.professionalId.toValue() === professionalId &&
-        isPhoneNumberExists.id.toValue() !== clientId &&
-        isPhoneNumberExists.name === name
-      ) {
-        return left(new AlreadyExists({ msg: 'Client already exists.' }));
-      }
+      // const isPhoneNumberExists =
+      //   await this.clientsRepository.findByPhoneNumber(phoneNumber);
+      // if (
+      //   isPhoneNumberExists?.professionalId.toValue() === professionalId &&
+      //   isPhoneNumberExists.id.toValue() === clientId &&
+      //   isPhoneNumberExists.name === name
+      // ) {
+      //   return left(new AlreadyExists({ msg: 'Client already exists.' }));
+      // }
       isValidClient.phoneNumber = phoneNumber;
     }
 
@@ -86,10 +85,10 @@ export class PatchClientsUseCase {
       isValidClient.profileUrl = profileUrl;
     }
 
-    await this.clientsRepository.save(clientId, isValidClient);
+    const client = await this.clientsRepository.save(clientId, isValidClient);
 
     return right({
-      client: isValidClient,
+      client: client,
     });
   }
 }

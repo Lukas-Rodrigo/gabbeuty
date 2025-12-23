@@ -22,13 +22,15 @@ export class PrismaBusinessServiceRepository implements BusinessServicesReposito
     });
   }
 
-  async create(businessService: BusinessService): Promise<void> {
+  async create(businessService: BusinessService): Promise<BusinessService> {
     const newBusinessService =
       PrismaBusinessServiceMapper.toPrisma(businessService);
 
-    await this.prismaService.businessService.create({
+    const data = await this.prismaService.businessService.create({
       data: newBusinessService,
     });
+
+    return PrismaBusinessServiceMapper.toDomain(data);
   }
   async findById(businessServiceId: string): Promise<BusinessService | null> {
     const businessServiceFound =

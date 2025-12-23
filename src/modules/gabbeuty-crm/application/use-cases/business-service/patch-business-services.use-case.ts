@@ -18,7 +18,7 @@ export interface PatchBusinessServicesUseCaseRequest {
 type PatchBusinessServicesUseCaseResponse = Either<
   ResourceNotFoundError | NotBelongsError,
   {
-    service: BusinessService;
+    businessService: BusinessService;
   }
 >;
 
@@ -77,7 +77,7 @@ export class PatchBusinessServicesUseCase {
     await this.businessServiceRepository.save(id, isValidBusinessServices);
 
     return right({
-      service: isValidBusinessServices,
+      businessService: isValidBusinessServices,
     });
   }
 }

@@ -15,8 +15,8 @@ describe('[Unit] CountAppointmentByStatusUseUseCase', () => {
   let sut: CountAppointmentByStatusUseUseCase;
 
   beforeEach(() => {
-    appointmentsRepository = new InMemoryAppointmentsRepository();
     userRepository = new InMemoryUserRepository();
+    appointmentsRepository = new InMemoryAppointmentsRepository();
     sut = new CountAppointmentByStatusUseUseCase(
       userRepository,
       appointmentsRepository,

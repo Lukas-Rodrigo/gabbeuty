@@ -11,6 +11,7 @@ import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositori
 import { BusinessServicesRepository } from '@/modules/gabbeuty-crm/domain/repositories/business-services.repository';
 import { ClientsRepository } from '@/modules/gabbeuty-crm/domain/repositories/clients.repository';
 import { Injectable } from '@nestjs/common';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 
 export interface CreateAppointmentRequest {
   date: Date;
@@ -23,7 +24,7 @@ export interface CreateAppointmentRequest {
 type CreateAppointmentResponse = Either<
   Error,
   {
-    appointment: Appointment;
+    appointment: AppointmentDetailsView;
   }
 >;
 
@@ -123,10 +124,11 @@ export class CreateAppointmentUseCase {
       title: newAppointment.title,
       clientName: newAppointment.clientName,
     });
-    await this.appointmentRepository.create(newAppointment);
+    const appointmentDetails =
+      await this.appointmentRepository.create(newAppointment);
 
     return right({
-      appointment: newAppointment,
+      appointment: appointmentDetails,
     });
   }
 }

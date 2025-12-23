@@ -18,10 +18,13 @@ describe('[Unit] CreateAppointmentUseCase', () => {
   let sut: CreateAppointmentUseCase;
 
   beforeEach(() => {
-    appointmentsRepository = new InMemoryAppointmentsRepository();
     userRepository = new InMemoryUserRepository();
     clientsRepository = new InMemoryClientsRepository();
     businessServicesRepository = new InMemoryBusinessServicesRepository();
+    appointmentsRepository = new InMemoryAppointmentsRepository(
+      clientsRepository,
+      businessServicesRepository,
+    );
     sut = new CreateAppointmentUseCase(
       appointmentsRepository,
       userRepository,

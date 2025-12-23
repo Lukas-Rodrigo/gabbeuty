@@ -78,9 +78,9 @@ describe('Patch Business Service (E2E)', () => {
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('service');
-    expect(response.body.service.props.name).toBe('Updated Service Name');
-    expect(response.body.service.props.price).toBe(75.0);
+    expect(response.body).toHaveProperty('createdAt');
+    expect(response.body.name).toBe('Updated Service Name');
+    expect(response.body.price).toBe(75.0);
   });
 
   test('[PATCH] /business-services/:id - should return 401 without token', async () => {

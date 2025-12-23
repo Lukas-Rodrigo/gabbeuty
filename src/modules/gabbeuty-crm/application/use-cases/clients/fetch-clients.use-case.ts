@@ -41,7 +41,7 @@ export class FetchClientsUseCase {
       );
     }
 
-    const clients = await this.clientsRepository.findByProfessionalId(
+    const clients = await this.clientsRepository.fetchByProfessionalId(
       professionalId,
       dateRange,
       pagination,
