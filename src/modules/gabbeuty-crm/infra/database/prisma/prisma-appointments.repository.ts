@@ -1,7 +1,7 @@
 import { DateRange } from '@/_shared/entities/date-range';
 import { PaginationParam } from '@/_shared/entities/pagination-param';
 import { Appointment } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
 import { PrismaAppointmentMapper } from './mapper/prisma-appointment.mapper';
 import { DomainEvents } from '@/_shared/event/domain-events';
@@ -18,7 +18,7 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
   async save(
     appointmentId: string,
     appointment: Appointment,
-  ): Promise<AppointmentDetails> {
+  ): Promise<AppointmentDetailsView> {
     const servicesData = PrismaAppointmentMapper.servicesToPrisma(appointment);
 
     //  2. Executar tudo em uma transação atômica
@@ -83,7 +83,7 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
     return PrismaAppointmentMapper.toDomainWithClient(appointmentPrisma);
   }
 
-  async create(appointment: Appointment): Promise<AppointmentDetails> {
+  async create(appointment: Appointment): Promise<AppointmentDetailsView> {
     const data = PrismaAppointmentMapper.toPrisma(appointment);
 
     const newAppointment = await this.prismaService.appointment.create({
@@ -147,7 +147,7 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
     professionalId: string,
     pagination: PaginationParam,
     dateRange: DateRange,
-  ): Promise<AppointmentDetails[]> {
+  ): Promise<AppointmentDetailsView[]> {
     const { page, perPage } = pagination;
     const { startDate, endDate } = dateRange;
     const appointments = await this.prismaService.appointment.findMany({

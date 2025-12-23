@@ -16,17 +16,17 @@ import { Client } from '../client.entity';
  * Pattern: Read Model (CQRS pattern)
  * Note: This is a Query-side projection, not a domain Value Object
  */
-export interface AppointmentDetailsProps {
+export interface AppointmentDetailsViewProps {
   appointment: Appointment;
   client: Client;
   services: BusinessService[];
 }
 
-export class AppointmentDetails {
-  private constructor(private props: AppointmentDetailsProps) {}
+export class AppointmentDetailsView {
+  private constructor(private props: AppointmentDetailsViewProps) {}
 
-  static create(props: AppointmentDetailsProps): AppointmentDetails {
-    return new AppointmentDetails(props);
+  static create(props: AppointmentDetailsViewProps): AppointmentDetailsView {
+    return new AppointmentDetailsView(props);
   }
 
   get appointment(): Appointment {

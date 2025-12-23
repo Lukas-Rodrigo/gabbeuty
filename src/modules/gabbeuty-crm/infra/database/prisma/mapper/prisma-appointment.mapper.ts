@@ -5,7 +5,7 @@ import { Client } from '@/modules/gabbeuty-crm/domain/entities/client.entity';
 import { AppointmentServiceList } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appoinment-service-list';
 import { AppointmentService } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-service';
 import { AppointmentStatus } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-status.vo';
-import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
+import { AppointmentDetailsView } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-details-view';
 import {
   AppointmentStatus as PrismaAppointmentStatus,
   Prisma,
@@ -119,7 +119,7 @@ export class PrismaAppointmentMapper {
 
   static toDomainWithClient(
     raw: PrismaAppointmentWithClientAndServices,
-  ): AppointmentDetails {
+  ): AppointmentDetailsView {
     const appointmentServices = raw.appointmentServices.map((service) =>
       AppointmentService.create(
         {
@@ -172,7 +172,7 @@ export class PrismaAppointmentMapper {
       ),
     );
 
-    return AppointmentDetails.create({
+    return AppointmentDetailsView.create({
       appointment: appointmentEntity,
       client: clientEntity,
       services: servicesEntities,
