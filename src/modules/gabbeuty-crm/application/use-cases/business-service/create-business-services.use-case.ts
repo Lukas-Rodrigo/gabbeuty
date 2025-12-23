@@ -2,9 +2,9 @@ import { Either, left, right } from '@/_shared/either';
 import { ResourceNotFoundError } from '@/_shared/errors/resource-not-found.error';
 import { UserRepository } from '@/_shared/repositories/user.repository';
 import { UniqueEntityID } from '@/_shared/entities/value-objects/unique-entity-id.vo';
-import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
 import { BusinessServicesRepository } from '@/modules/gabbeuty-crm/domain/repositories/business-services.repository';
 import { Injectable } from '@nestjs/common';
+import { BusinessService } from '@/modules/gabbeuty-crm/domain/entities/business-service.entity';
 
 export interface CreateBusinessServicesUseCaseRequest {
   professionalId: string;
@@ -16,7 +16,9 @@ export interface CreateBusinessServicesUseCaseRequest {
 
 type CreateBusinessServicesUseCaseResponse = Either<
   ResourceNotFoundError,
-  null
+  {
+    businessService: BusinessService;
+  }
 >;
 
 @Injectable()
@@ -48,8 +50,11 @@ export class CreateBusinessServicesUseCase {
       duration: 60,
     });
 
-    await this.businessServicesRepository.create(businessService);
+    const newBusinessService =
+      await this.businessServicesRepository.create(businessService);
 
-    return right(null);
+    return right({
+      businessService: newBusinessService,
+    });
   }
 }
