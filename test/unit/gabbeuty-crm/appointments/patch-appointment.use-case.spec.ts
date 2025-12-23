@@ -124,7 +124,9 @@ describe('[Unit] PatchAppointmentUseCase', () => {
     });
     await appointmentsRepository.create(appointment);
 
-    const newDate = new Date('2025-12-20');
+    const newDate = new Date();
+    newDate.setDate(new Date().getDate() + 3);
+
     const result = await sut.execute({
       appointmentId: appointment.id.toValue(),
       professionalId,
