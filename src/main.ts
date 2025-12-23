@@ -6,6 +6,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { GlobalHttpExceptionFilter } from './_shared/filters/global-http-exception.filter';
 import { SwaggerModule } from '@nestjs/swagger';
 import { swaggerConfig } from './_shared/docs/swagger.config';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -40,6 +41,13 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
+
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
 
   await app.listen(port);
   logger.log(`Application is running on: http://localhost:${port}`);
