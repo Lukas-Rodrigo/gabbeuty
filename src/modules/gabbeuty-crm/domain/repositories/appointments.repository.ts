@@ -7,9 +7,12 @@ import { AppointmentMetrics } from '../entities/value-objects/appointment-metric
 
 export abstract class AppointmentsRepository {
   // used
-  abstract create(appointment: Appointment): Promise<void>;
+  abstract create(appointment: Appointment): Promise<AppointmentDetails>;
 
-  abstract save(appointmentId: string, appointment: Appointment): Promise<void>;
+  abstract save(
+    appointmentId: string,
+    appointment: Appointment,
+  ): Promise<AppointmentDetails>;
 
   abstract findById(appointmentId: string): Promise<Appointment | null>;
 

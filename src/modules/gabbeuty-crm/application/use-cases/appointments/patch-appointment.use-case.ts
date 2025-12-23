@@ -9,6 +9,7 @@ import {
   CannotModifyCompletedAppointmentError,
 } from '@/modules/gabbeuty-crm/domain/entities/appointment.entity';
 import { AppointmentService } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-service';
+import { AppointmentDetails } from '@/modules/gabbeuty-crm/domain/entities/value-objects/appointment-with-client.vo';
 import { AppointmentsRepository } from '@/modules/gabbeuty-crm/domain/repositories/appointments.repository';
 import { BusinessServicesRepository } from '@/modules/gabbeuty-crm/domain/repositories/business-services.repository';
 import { ClientsRepository } from '@/modules/gabbeuty-crm/domain/repositories/clients.repository';
@@ -26,7 +27,7 @@ export interface PatchAppointmentUseCaseRequest {
 type PatchAppointmentUseCaseResponse = Either<
   ResourceNotFoundError | InvalidDateError,
   {
-    appointment: Appointment;
+    appointment: AppointmentDetails;
   }
 >;
 
@@ -139,10 +140,13 @@ export class PatchAppointmentUseCase {
     }
 
     appointment.markAsPatch(appointmentEventData);
-    await this.appointmentsRepository.save(appointmentId, appointment);
+    const appointmentDetails = await this.appointmentsRepository.save(
+      appointmentId,
+      appointment,
+    );
 
     return right({
-      appointment,
+      appointment: appointmentDetails,
     });
   }
 

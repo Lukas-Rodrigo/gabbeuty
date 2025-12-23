@@ -15,7 +15,10 @@ import { PrismaProvider } from '@/_shared/_infra/database/prisma/prisma.provider
 export class PrismaAppointmentRepository implements AppointmentsRepository {
   constructor(private prismaService: PrismaProvider) {}
 
-  async save(appointmentId: string, appointment: Appointment): Promise<void> {
+  async save(
+    appointmentId: string,
+    appointment: Appointment,
+  ): Promise<AppointmentDetails> {
     const servicesData = PrismaAppointmentMapper.servicesToPrisma(appointment);
 
     //  2. Executar tudo em uma transação atômica
@@ -61,19 +64,45 @@ export class PrismaAppointmentRepository implements AppointmentsRepository {
         : []),
     ]);
 
+    const appointmentPrisma = await this.prismaService.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        client: true,
+        appointmentServices: {
+          include: {
+            service: true,
+          },
+        },
+      },
+    });
+    if (!appointmentPrisma) {
+      throw new Error('Appointment not found after save');
+    }
     DomainEvents.dispatchEventsForAggregate(new UniqueEntityID(appointmentId));
+
+    return PrismaAppointmentMapper.toDomainWithClient(appointmentPrisma);
   }
 
-  async create(appointment: Appointment): Promise<void> {
+  async create(appointment: Appointment): Promise<AppointmentDetails> {
     const data = PrismaAppointmentMapper.toPrisma(appointment);
 
     const newAppointment = await this.prismaService.appointment.create({
       data,
+      include: {
+        client: true,
+        appointmentServices: {
+          include: {
+            service: true,
+          },
+        },
+      },
     });
 
     DomainEvents.dispatchEventsForAggregate(
       new UniqueEntityID(newAppointment.id),
     );
+
+    return PrismaAppointmentMapper.toDomainWithClient(newAppointment);
   }
 
   async findById(appointmentId: string): Promise<Appointment | null> {
