@@ -75,12 +75,14 @@ describe('Patch Appointment (E2E)', () => {
       },
     });
 
+    const date = new Date();
+    date.setDate(new Date().getDate() + 3);
     await request(app.getHttpServer())
       .post('/appointments')
       .set('Cookie', cookies)
       .send({
         clientId: client.id,
-        date: '2025-12-25T15:30:00.000Z',
+        date,
         servicesIds: [{ id: service.id }],
       });
 
