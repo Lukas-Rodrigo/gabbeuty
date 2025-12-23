@@ -2,6 +2,7 @@ import { Env } from '@/env';
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import z from 'zod';
 
@@ -20,7 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const publicKey = config.get('JWT_PUBLIC_KEY', { infer: true });
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req.cookies.access_token,
+      ]),
       secretOrKey: Buffer.from(publicKey, 'base64'),
       algorithms: ['RS256'],
     });

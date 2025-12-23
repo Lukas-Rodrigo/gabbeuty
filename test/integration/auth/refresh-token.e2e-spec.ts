@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Refresh Token (E2E)', () => {
   let app: INestApplication;
@@ -30,11 +31,12 @@ describe('Refresh Token (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -49,26 +51,38 @@ describe('Refresh Token (E2E)', () => {
         password: user.plainPassword,
       });
 
-    const { refreshToken } = loginResponse.body;
+    const loginCookies = Array.isArray(loginResponse.headers['set-cookie'])
+      ? loginResponse.headers['set-cookie']
+      : [loginResponse.headers['set-cookie']];
+    const refreshTokenCookie = loginCookies.find((cookie: string) =>
+      cookie.includes('refresh_token='),
+    );
+    const oldRefreshToken = refreshTokenCookie
+      ?.split('refresh_token=')[1]
+      ?.split(';')[0];
 
     const response = await request(app.getHttpServer())
       .post('/auth/refresh')
-      .send({
-        refreshToken,
-      });
+      .set('Cookie', loginCookies);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('accessToken');
-    expect(response.body).toHaveProperty('refreshToken');
-    expect(response.body.refreshToken).not.toBe(refreshToken);
+    expect(response.headers['set-cookie']).toBeDefined();
+    const newCookies = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']];
+    const newRefreshTokenCookie = newCookies.find((cookie: string) =>
+      cookie.includes('refresh_token='),
+    );
+    const newRefreshToken = newRefreshTokenCookie
+      ?.split('refresh_token=')[1]
+      ?.split(';')[0];
+    expect(newRefreshToken).not.toBe(oldRefreshToken);
   });
 
   test('[POST] /auth/refresh - should return 401 for invalid token', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/refresh')
-      .send({
-        refreshToken: 'invalid-token',
-      });
+      .set('Cookie', ['refresh_token=invalid-token']);
 
     expect(response.statusCode).toBe(401);
   });
@@ -91,9 +105,7 @@ describe('Refresh Token (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/auth/refresh')
-      .send({
-        refreshToken: expiredToken.token,
-      });
+      .set('Cookie', [`refresh_token=${expiredToken.token}`]);
 
     expect(response.statusCode).toBe(401);
   });

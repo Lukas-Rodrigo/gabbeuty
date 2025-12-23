@@ -53,9 +53,10 @@ describe('[Unit] CreateAppointmentUseCase', () => {
       duration: 60,
     });
     await businessServicesRepository.create(service);
-
+    const date = new Date();
+    date.setDate(new Date().getDate() + 3);
     const result = await sut.execute({
-      date: new Date('2025-12-20'),
+      date,
       professionalId,
       clientId: client.id.toValue(),
       servicesIds: [service.id.toValue()],

@@ -5,12 +5,13 @@ import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import { randomUUID } from 'crypto';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Patch Client (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,6 +32,9 @@ describe('Patch Client (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+    // 🔒 CRÍTICO: Configurar MockEntities para usar o Prisma do teste (schema test_e2e)
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -42,11 +46,13 @@ describe('Patch Client (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -54,7 +60,7 @@ describe('Patch Client (E2E)', () => {
   test('[PATCH] /clients/:id', async () => {
     const createResponse = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Client To Update',
         phoneNumber: '5511999887766',
@@ -68,7 +74,7 @@ describe('Patch Client (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .patch(`/clients/${client!.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Updated Client Name',
         observation: 'New observation',
@@ -93,7 +99,7 @@ describe('Patch Client (E2E)', () => {
   test('[PATCH] /clients/:id - should return 409 for non-existent client', async () => {
     const response = await request(app.getHttpServer())
       .patch(`/clients/${randomUUID()}`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Updated Name',
       });
@@ -104,7 +110,7 @@ describe('Patch Client (E2E)', () => {
   test('[PATCH] /clients/:id - should return 400 for invalid phone', async () => {
     const createResponse = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Client For Invalid Update',
         phoneNumber: '5511888776655',
@@ -118,7 +124,7 @@ describe('Patch Client (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .patch(`/clients/${client!.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         phoneNumber: 'invalid',
       });

@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Fetch Appointments (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
   let userId: string;
 
   beforeAll(async () => {
@@ -31,6 +32,8 @@ describe('Fetch Appointments (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -43,11 +46,13 @@ describe('Fetch Appointments (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -71,25 +76,25 @@ describe('Fetch Appointments (E2E)', () => {
 
     await request(app.getHttpServer())
       .post('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         clientId: client.id,
-        date: '2025-12-20T15:30:00.000Z',
+        date: '2025-12-25T15:30:00.000Z',
         servicesIds: [{ id: service.id }],
       });
 
     await request(app.getHttpServer())
       .post('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         clientId: client.id,
-        date: '2025-12-21T16:00:00.000Z',
+        date: '2025-12-26T16:00:00.000Z',
         servicesIds: [{ id: service.id }],
       });
 
     const response = await request(app.getHttpServer())
       .get('/appointments')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('appointments');
@@ -106,7 +111,7 @@ describe('Fetch Appointments (E2E)', () => {
   test('[GET] /appointments - should support pagination', async () => {
     const response = await request(app.getHttpServer())
       .get('/appointments?page=1&perPage=1')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.appointments.length).toBeLessThanOrEqual(1);

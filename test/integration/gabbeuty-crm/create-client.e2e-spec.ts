@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Create Client (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -31,6 +32,10 @@ describe('Create Client (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    // 🔒 CRÍTICO: Configurar MockEntities para usar o Prisma do teste (schema test_e2e)
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -42,11 +47,13 @@ describe('Create Client (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -54,7 +61,7 @@ describe('Create Client (E2E)', () => {
   test('[POST] /clients', async () => {
     const response = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'John Doe',
         phoneNumber: '5511999887766',
@@ -75,7 +82,7 @@ describe('Create Client (E2E)', () => {
   test('[POST] /clients - should return 400 for invalid phone', async () => {
     const response = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Test User',
         phoneNumber: '123',
@@ -87,7 +94,7 @@ describe('Create Client (E2E)', () => {
   test('[POST] /clients - should return 400 for missing name', async () => {
     const response = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         phoneNumber: '5511999887766',
       });

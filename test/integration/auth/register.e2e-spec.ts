@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Register User (E2E)', () => {
   let app: INestApplication;
@@ -30,11 +31,12 @@ describe('Register User (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });

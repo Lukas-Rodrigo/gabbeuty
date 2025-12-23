@@ -4,12 +4,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Create Business Service (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -30,6 +31,8 @@ describe('Create Business Service (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -41,11 +44,13 @@ describe('Create Business Service (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -53,7 +58,7 @@ describe('Create Business Service (E2E)', () => {
   test('[POST] /business-services', async () => {
     const response = await request(app.getHttpServer())
       .post('/business-services')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Haircut Service',
         price: 50.0,
@@ -76,7 +81,7 @@ describe('Create Business Service (E2E)', () => {
   test('[POST] /business-services - should return 400 for missing name', async () => {
     const response = await request(app.getHttpServer())
       .post('/business-services')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         price: 50.0,
       });

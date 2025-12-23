@@ -5,12 +5,13 @@ import { Test } from '@nestjs/testing';
 import { MockEntities } from '@test/helpers/utils/mock-entities.helper';
 import { randomUUID } from 'crypto';
 import request from 'supertest';
+import cookieParser from 'cookie-parser';
 
 describe('Delete Client (E2E)', () => {
   let app: INestApplication;
   let prisma: PrismaProvider;
   let mockEntities: MockEntities;
-  let accessToken: string;
+  let cookies: string[];
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -32,6 +33,9 @@ describe('Delete Client (E2E)', () => {
 
     prisma = moduleRef.get(PrismaProvider);
     mockEntities = new MockEntities(app, prisma);
+
+    app.use(cookieParser());
+    app.use(cookieParser());
     await app.init();
 
     const user = await mockEntities.createUser();
@@ -43,11 +47,13 @@ describe('Delete Client (E2E)', () => {
         password: user.plainPassword,
       });
 
-    accessToken = loginResponse.body.accessToken;
+    const setCookieHeader = loginResponse.headers['set-cookie'];
+    cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [setCookieHeader].filter(Boolean);
   });
 
   afterAll(async () => {
-    await mockEntities.cleanupAll();
     await app.close();
     await prisma.$disconnect();
   });
@@ -55,7 +61,7 @@ describe('Delete Client (E2E)', () => {
   test('[DELETE] /clients/:id', async () => {
     const createResponse = await request(app.getHttpServer())
       .post('/clients')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies)
       .send({
         name: 'Client To Delete',
         phoneNumber: '5511999887766',
@@ -69,7 +75,7 @@ describe('Delete Client (E2E)', () => {
 
     const response = await request(app.getHttpServer())
       .delete(`/clients/${client!.id}`)
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(204);
   });
@@ -85,7 +91,7 @@ describe('Delete Client (E2E)', () => {
   test('[DELETE] /clients/:id - should return 404 for non-existent client', async () => {
     const response = await request(app.getHttpServer())
       .delete(`/clients/${randomUUID()}`)
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set('Cookie', cookies);
 
     expect(response.statusCode).toBe(404);
   });
